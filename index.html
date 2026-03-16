@@ -2040,7 +2040,7 @@ if ('serviceWorker' in navigator) {
   <button onclick="window.open('https://forms.gle/263ziiHoxq2DvTNS9','_blank');closeFeedbackModal();" style="width:100%;padding:14px;margin-bottom:10px;background:#1a73e8;border:none;border-radius:8px;color:#fff;font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;text-align:center;">📋 Open Feedback Form</button>
   <p style="font-family:var(--mono);font-size:10px;color:var(--text3);margin:0 0 10px 0;text-align:center;">Opens a short Google Form in a new tab</p>
   <div style="border-top:1px solid var(--border);margin:12px 0;"></div>
-  <a href="mailto:nept.app.feedback@gmail.com?subject=NEPT%20App%20Feedback" onclick="closeFeedbackModal();" style="display:block;width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;">✉️ Email Us Directly</a>
+  <a href="/cdn-cgi/l/email-protection#016f6471752f6071712f676464656360626a41666c60686d2f626e6c3e7274636b6462753c4f445155243331407171243331476464656360626a" onclick="closeFeedbackModal();" style="display:block;width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;">✉️ Email Us Directly</a>
   <p style="font-family:var(--mono);font-size:10px;color:var(--text3);margin:8px 0 0 0;text-align:center;">Opens your email app</p>
 </div>
 
@@ -2124,7 +2124,7 @@ if ('serviceWorker' in navigator) {
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── DATA LOADING ─────────────────────────────────────────────────────────
 // Data is embedded directly for standalone use.
 let NEPT_DATA = null;
@@ -3373,7 +3373,7 @@ function renderFullProtocol(protocolId, fullProto) {
   if (srcHtml) {
     html += srcHtml;
   } else if (p) {
-    if (p.background) html += '<p class="fp-p">' + p.background + '</p>';
+    if (p.background) { var _bgStr = typeof p.background === 'string' ? p.background : (Array.isArray(p.background) ? p.background.map(function(b){return b.text;}).join(' ') : ''); if (_bgStr) html += '<p class="fp-p">' + _bgStr + '</p>'; }
     if (p.recognition && p.recognition.length) {
       html += '<h3 class="fp-h3">Recognition</h3><ul class="fp-ul">';
       p.recognition.forEach(function(r){ 
@@ -3675,7 +3675,8 @@ function doSearch(val) {
 
     if (p.title.toLowerCase().includes(q)) { score += 100; matches.push('title'); }
     if (p.id.toLowerCase().includes(q)) { score += 90; matches.push('id'); }
-    if (p.background && p.background.toLowerCase().includes(q)) { score += 30; matches.push('background'); }
+    var _bgSearch = typeof p.background === 'string' ? p.background : (Array.isArray(p.background) ? p.background.map(function(b){return b.text;}).join(' ') : '');
+    if (_bgSearch && _bgSearch.toLowerCase().includes(q)) { score += 30; matches.push('background'); }
 
     if (p.recognition) {
       p.recognition.forEach(function(r) {
@@ -3707,7 +3708,8 @@ function doSearch(val) {
 
     if (score > 0) {
       var isAssess = p.category === 'Assessment Tools';
-      var result = { id: p.id, title: titleClean, fullTitle: p.title, score: score, matches: matches, category: p.category || 'General', background: (p.background || '').substring(0, 120) };
+      var _bgSnippet = typeof p.background === 'string' ? p.background : (Array.isArray(p.background) ? p.background.map(function(b){return b.text;}).join(' ') : '');
+      var result = { id: p.id, title: titleClean, fullTitle: p.title, score: score, matches: matches, category: p.category || 'General', background: (_bgSnippet || '').substring(0, 120) };
       if (isAssess) { toolResults.push(result); } else { cppResults.push(result); }
     }
   });
@@ -4139,8 +4141,17 @@ function renderProtocol(p) {
 
   // Background
   if (p.background) {
-    html += '<div class="section"><div class="section-title">Background</div>' +
-      '<div class="background-text">' + p.background + '</div></div>';
+    var bgText = '';
+    if (typeof p.background === 'string') { bgText = p.background; }
+    else if (Array.isArray(p.background)) {
+      p.background.forEach(function(b) {
+        if (!b.scopes || b.scopes.indexOf(scope) !== -1) bgText += (bgText ? ' ' : '') + b.text;
+      });
+    }
+    if (bgText) {
+      html += '<div class="section"><div class="section-title">Background</div>' +
+        '<div class="background-text">' + bgText + '</div></div>';
+    }
   }
   // Assessment table (use master data - identical across all scopes)
   var assessTable = p.assessment_table;
@@ -4237,11 +4248,14 @@ function renderProtocol(p) {
     if (rc.footer) html += '<div class="dash-footer">' + linkCPPs(rc.footer) + '</div>';
     html += '</div></div></div>';
   } else if (p.recognition && p.recognition.length) {
+    var _filteredRecog = p.recognition.filter(function(r) { return typeof r === 'string' || !r.scopes || r.scopes.indexOf(scope) !== -1; });
+    if (_filteredRecog.length) {
     html += '<div class="section"><div class="section-title">Recognition / Criteria</div><div class="recog-list">';
-    p.recognition.forEach(function(r) {
+    _filteredRecog.forEach(function(r) {
       html += '<div class="recog-item">' + (typeof r === 'string' ? r : r.text || r) + '</div>';
     });
     html += '</div></div>';
+    }
   }
 
   
@@ -4356,6 +4370,32 @@ function renderProtocol(p) {
         html += '<div class="dash-preview">' + previewText + '</div>';
         html += '<div class="dash-detail">';
         if (card.body) html += '<p style="margin-bottom:8px">' + linkCPPs(card.body) + '</p>';
+        if (card.subs) { card.subs.forEach(function(sub, si) {
+          var subNewSet = learnDiff && !learnDiff.isEntirelyNew && learnDiff.newSubParams ? learnDiff.newSubParams[si] : null;
+          var subAllNew = subNewSet === '__ALL__';
+          var subBg = 'rgba(245,158,11,0.12)';
+          var subBd = '#f59e0b';
+          html += '<div class="dash-sub"' + (subAllNew ? ' style="background:' + subBg + ';border:1px solid ' + subBd + ';border-radius:6px;padding:6px 8px;margin:4px 0;"' : '') + '>';
+          html += '<div class="dash-sub-label">' + sub.label + (subAllNew ? ' <span class="learn-badge" style="font-size:8px;padding:1px 4px;margin-left:4px;background:' + learnColor + ';">NEW</span>' : '') + '</div>';
+          if (sub.style === 'dotpoints' && sub.params) {
+            html += '<ul style="margin:6px 0 0 18px;padding:0;list-style:disc;font-size:13px;line-height:1.6;color:rgba(255,255,255,0.85);">';
+            sub.params.forEach(function(p) { html += '<li>' + linkCPPs(p) + '</li>'; });
+            html += '</ul>';
+          } else if (sub.params) { html += '<div class="dash-tags">'; sub.params.forEach(function(p) { var hi = p.charAt(0) === '\u2b24'; var text = hi ? p.substring(2) : p; var cls = hi ? 'dash-tag dash-tag-hi-red' : 'dash-tag'; html += '<span class="' + cls + '">' + linkCPPs(text) + '</span>'; }); html += '</div>'; }
+          if (sub.scope_params && sub.scope_params[scope]) {
+            html += '<div class="dash-tags" style="margin-top:4px;">';
+            sub.scope_params[scope].forEach(function(p) {
+              var hi = p.charAt(0) === '\u2b24'; var text = hi ? p.substring(2) : p;
+              var isNSub = subNewSet && subNewSet !== '__ALL__' && subNewSet.has && subNewSet.has(p);
+              if ((subAllNew || isNSub) && learnDiff && !learnDiff.isEntirelyNew) {
+                html += '<span class="dash-tag" style="background:' + learnBg + '!important;border-color:' + learnBd + '!important;">' + linkCPPs(text) + ' <span class="learn-badge" style="font-size:8px;padding:1px 4px;margin-left:4px;background:' + learnColor + ';">NEW</span></span>';
+              } else {
+                html += '<span class="' + (hi ? 'dash-tag dash-tag-hi-red' : 'dash-tag') + '">' + linkCPPs(text) + '</span>';
+              }
+            });
+            html += '</div>';
+          }
+          html += '</div>'; }); }
         if (card.params && card.params.length) { html += '<div class="dash-tags">'; card.params.forEach(function(p) { var hi = p.charAt(0) === '\u2b24'; var text = hi ? p.substring(2) : p; var cls = hi ? 'dash-tag dash-tag-hi-red' : 'dash-tag'; html += '<span class="' + cls + '">' + linkCPPs(text) + '</span>'; }); html += '</div>'; }
         if (card.scope_params && card.scope_params[scope] && card.scope_params[scope].length) {
           html += '<div class="dash-tags" style="margin-top:6px">';
@@ -4372,28 +4412,6 @@ function renderProtocol(p) {
           });
           html += '</div>';
         }
-        if (card.subs) { card.subs.forEach(function(sub, si) {
-          var subNewSet = learnDiff && !learnDiff.isEntirelyNew && learnDiff.newSubParams ? learnDiff.newSubParams[si] : null;
-          var subAllNew = subNewSet === '__ALL__';
-          var subBg = 'rgba(245,158,11,0.12)';
-          var subBd = '#f59e0b';
-          html += '<div class="dash-sub"' + (subAllNew ? ' style="background:' + subBg + ';border:1px solid ' + subBd + ';border-radius:6px;padding:6px 8px;margin:4px 0;"' : '') + '>';
-          html += '<div class="dash-sub-label">' + sub.label + (subAllNew ? ' <span class="learn-badge" style="font-size:8px;padding:1px 4px;margin-left:4px;background:' + learnColor + ';">NEW</span>' : '') + '</div>';
-          if (sub.params) { html += '<div class="dash-tags">'; sub.params.forEach(function(p) { var hi = p.charAt(0) === '\u2b24'; var text = hi ? p.substring(2) : p; var cls = hi ? 'dash-tag dash-tag-hi-red' : 'dash-tag'; html += '<span class="' + cls + '">' + linkCPPs(text) + '</span>'; }); html += '</div>'; }
-          if (sub.scope_params && sub.scope_params[scope]) {
-            html += '<div class="dash-tags" style="margin-top:4px;">';
-            sub.scope_params[scope].forEach(function(p) {
-              var hi = p.charAt(0) === '\u2b24'; var text = hi ? p.substring(2) : p;
-              var isNSub = subNewSet && subNewSet !== '__ALL__' && subNewSet.has && subNewSet.has(p);
-              if ((subAllNew || isNSub) && learnDiff && !learnDiff.isEntirelyNew) {
-                html += '<span class="dash-tag" style="background:' + learnBg + '!important;border-color:' + learnBd + '!important;">' + linkCPPs(text) + ' <span class="learn-badge" style="font-size:8px;padding:1px 4px;margin-left:4px;background:' + learnColor + ';">NEW</span></span>';
-              } else {
-                html += '<span class="' + (hi ? 'dash-tag dash-tag-hi-red' : 'dash-tag') + '">' + linkCPPs(text) + '</span>';
-              }
-            });
-            html += '</div>';
-          }
-          html += '</div>'; }); }
         if (card.branch) { html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><div style="padding:10px;border-radius:6px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);font-size:12px;line-height:1.4"><div style="font-weight:700;font-size:11px;color:var(--green);margin-bottom:4px">' + card.branch.yes_label + '</div>' + linkCPPs(card.branch.yes_text) + '</div><div style="padding:10px;border-radius:6px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);font-size:12px;line-height:1.4"><div style="font-weight:700;font-size:11px;color:var(--red);margin-bottom:4px">' + card.branch.no_label + '</div>' + linkCPPs(card.branch.no_text) + '</div></div>'; }
         if (card.badge || scopeNote) { html += '<div style="margin-top:8px">'; if (card.badge === 'memory') html += '<span class="dash-badge memory">MEMORY</span> '; else if (card.badge === 'scope') html += '<span class="dash-badge scope">SCOPE-DEPENDENT</span> '; if (scopeNote && scopeNote.indexOf('TE') === -1) { html += '<span class="dash-badge scope">' + escapeHtml(scopeNote) + '</span>'; } html += '</div>'; }
         if (card.footer) html += '<div class="dash-footer">' + linkCPPs(card.footer) + '</div>';
@@ -6537,7 +6555,7 @@ SOURCE_CPP_HTML["CPP033"] = "<h2 class=\"fp-h2\">Potential spinal injury</h2>\n<
 const NEPT_EMBEDDED_DATA = {
   "metadata": {
     "title": "NEPT CPP Master Training Data",
-    "app_version": "Beta V022",
+    "app_version": "Beta V024",
     "version": "2024",
     "source": "Non-Emergency Patient Transport Clinical Practice Protocols 2024 (Victoria)",
     "scopes": [
@@ -12589,7 +12607,7 @@ const NEPT_EMBEDDED_DATA = {
           ]
         },
         {
-          "text": "Other symptoms: nausea/vomiting, diaphoresis, ECG abnormalities, jaw/back radiation, aching/pressure/tightness, dyspnoea",
+          "text": "Men typically present with crushing chest pain radiating to the left arm. Women more often experience jaw, back, neck or groin pain, extreme fatigue, or nausea — symptoms easily mistaken for minor ailments, risking delayed treatment. Women may not experience any pain at all.",
           "scopes": [
             "PTO",
             "EN",
@@ -12692,16 +12710,26 @@ const NEPT_EMBEDDED_DATA = {
         {
           "title": "🫀 Suspect ACS",
           "priority": 1,
-          "body": "Acute central or epigastric chest pain without other definitive diagnosis. Includes STEMI, NSTEMI, and unstable angina.",
+          "body": "Acute central chest pain or epigastric pain without other definitive diagnosis. Includes STEMI, NSTEMI, and unstable angina.",
           "params": [
-            "Nausea / vomiting",
-            "Diaphoresis",
-            "ECG abnormalities",
-            "Pain radiating to jaw or back",
-            "Aching, pressure, tightness or burning",
-            "Dyspnoea",
             "⬤ NEPT must NOT transport patient with cardiac chest pain within 2 hours of presentation",
             "⬤ Escalate per CPP006 — ACS is time critical"
+          ],
+          "subs": [
+            {
+              "label": "Symptoms may include",
+              "params": [
+                "Nausea / vomiting",
+                "Diaphoresis",
+                "ECG abnormalities",
+                "Pain radiating to jaw, back, neck or groin",
+                "Aching, pressure, tightness or burning",
+                "Dyspnoea",
+                "Fatigue",
+                "Anxiety"
+              ],
+              "style": "dotpoints"
+            }
           ]
         },
         {
@@ -13252,6 +13280,69 @@ const NEPT_EMBEDDED_DATA = {
       ]
     },
     {
+      "id": "CPP008_009_PTO",
+      "title": "CPP008/009: Tachycardia",
+      "category": "Cardiac",
+      "scope_applicable": [
+        "PTO"
+      ],
+      "background": "Tachycardia (heart rate >100 bpm) may indicate physiological distress such as infection, pain, hypovolaemia, or fever — or a dangerous cardiac arrhythmia. Without ECG, the specific type cannot be differentiated. Focus on escalation per CPP006 and management of symptoms and perfusion status.",
+      "recognition": [
+        {
+          "text": "Heart rate >100 bpm",
+          "scopes": [
+            "PTO"
+          ]
+        },
+        {
+          "text": "Symptoms: palpitations, dizziness, SOB, chest discomfort",
+          "scopes": [
+            "PTO"
+          ]
+        }
+      ],
+      "memory_items": [
+        "Escalate immediately per CPP006",
+        "Cannot differentiate tachycardia type without ECG",
+        "Have AED ready for immediate use if cardiac arrest"
+      ],
+      "action_cards": [
+        {
+          "title": "💓 Tachycardia Identified",
+          "priority": 1,
+          "body": "Heart rate >100 bpm detected. Escalate immediately as per CPP006.",
+          "subs": [
+            {
+              "label": "Assess perfusion",
+              "params": [
+                "Check BP, HR and SpO₂",
+                "Consult clinician for advice"
+              ]
+            },
+            {
+              "label": "Prepare for deterioration",
+              "params": [
+                "Prepare for deterioration and cardiac arrest",
+                "Ready AED for immediate use if cardiac arrest",
+                "Prepare airway equipment and suction"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "🔗 Related Protocols",
+          "priority": 3,
+          "params": [
+            "If cardiac arrest → CPP004: Cardiac Arrest – Adult",
+            "If acute chest pain → CPP023: Acute Coronary Syndrome",
+            "Escalation → CPP006"
+          ]
+        }
+      ],
+      "medications_used": [],
+      "quiz_triggers": []
+    },
+    {
       "id": "CPP008",
       "title": "CPP008: Narrow Complex Tachycardia (NCT)",
       "category": "Cardiac",
@@ -13262,7 +13353,7 @@ const NEPT_EMBEDDED_DATA = {
         "RN",
         "RNCC"
       ],
-      "background": "NCT = QRS <0.12s, rate >100. Types: sinus tach, AF, SVT/PSVT, atrial flutter, atrial tach, junctional tach. Unexplained sinus tachycardia may indicate physiological distress — investigate cause. Synchronised cardioversion not authorised for routine NEPT use.",
+      "background": "NCT = QRS <0.12s, rate >100. Types: sinus tach, AF, SVT/PSVT, atrial flutter, atrial tach, junctional tach. Unexplained sinus tachycardia may indicate physiological distress — investigate cause.",
       "recognition": [
         {
           "text": "Heart rate >100 with QRS <0.12s on ECG",
@@ -13323,17 +13414,18 @@ const NEPT_EMBEDDED_DATA = {
       ],
       "action_cards": [
         {
-          "title": "💓 Identify NCT",
+          "title": "💓 Confirm NCT via ECG",
           "priority": 1,
           "body": "QRS < 0.12s with rate > 100 bpm. Types include: sinus tachycardia, rapid AF, SVT/PSVT, atrial flutter, atrial tachycardia, junctional tachycardia.",
           "params": [
-            "⬤ Unexplained sinus tachycardia = physiological distress until proven otherwise (e.g. sepsis, hypovolaemia, pain, PE, fever, anxiety)"
+            "⬤ Unexplained sinus tachycardia = physiological distress until proven otherwise (e.g. sepsis, hypovolaemia, pain, PE, fever, anxiety)",
+            "⬤ Escalate care per CPP006"
           ]
         },
         {
           "title": "🔴 Perfusion Status",
           "priority": 1,
-          "body": "Establish overall perfusion status. Escalate care per CPP006.",
+          "body": "Establish overall perfusion status.",
           "subs": [
             {
               "label": "Adequate or borderline perfusion",
@@ -13413,10 +13505,10 @@ const NEPT_EMBEDDED_DATA = {
         "RN",
         "RNCC"
       ],
-      "background": "WCT: QRS >0.12s, rate >100, lasting >30s. In out-of-hospital without diagnostics, always treat as VT. NEPT not authorised to commence IFT with active WCT unless specifically planned.",
+      "background": "WCT causes include: cardiomyopathy, acidosis, coronary artery disease, drug toxicity, hyperkalaemia. Always treat as VT. NEPT not authorised to commence IFT with active WCT unless specifically planned.",
       "recognition": [
         {
-          "text": "WCT: rate >100, QRS >0.12s, lasting >30s, regular, AV dissociation or no P waves",
+          "text": "WCT: rate >100, QRS >0.12s, lasting >30s, regular (unless polymorphic and progressive as seen with Torsades de Pointes), AV dissociation or no P waves",
           "scopes": [
             "EN",
             "ATA",
@@ -13466,14 +13558,13 @@ const NEPT_EMBEDDED_DATA = {
       ],
       "action_cards": [
         {
-          "title": "💓 Identify WCT — Presume VT",
+          "title": "💓 Confirm WCT via ECG — Presume VT",
           "priority": 1,
           "badge": "memory",
-          "body": "QRS > 0.12s, rate > 100, lasting > 30 seconds, regular, AV dissociation or absent P waves.\nIn out-of-hospital without diagnostics — always presume ventricular tachycardia (VT).",
+          "body": "QRS > 0.12s, rate > 100, lasting > 30 seconds.",
           "params": [
             "⬤ Manage with high caution — anticipate deterioration regardless of perfusion",
-            "⬤ NEPT must NOT commence IFT for patient with current WCT",
-            "Causes include: cardiomyopathy, acidosis, coronary artery disease, drug toxicity, hyperkalaemia"
+            "⬤ NEPT must NOT commence IFT for patient with current WCT"
           ]
         },
         {
@@ -13485,8 +13576,6 @@ const NEPT_EMBEDDED_DATA = {
               "⬤ Escalate per CPP006 — clinical consult strongly recommended",
               "⬤ Have AED immediately available for use if cardiac arrest",
               "Prepare airway equipment and suction",
-              "Continuous ECG monitoring",
-              "⬤ Do NOT administer GTN",
               "If acute onset associated with chest pain → manage per CPP023 ACS"
             ],
             "EN": [
@@ -13554,7 +13643,7 @@ const NEPT_EMBEDDED_DATA = {
           "title": "🔗 Related Protocols",
           "priority": 3,
           "params": [
-            "If pulseless VT → CPP004 Cardiac Arrest",
+            "If pulseless VT, unconscious or ineffective / absent breathing → CPP004: Cardiac Arrest – Adult",
             "If ACS features → CPP023 (do NOT give GTN)",
             "Escalation → CPP006"
           ]
@@ -13582,7 +13671,28 @@ const NEPT_EMBEDDED_DATA = {
         "RN",
         "RNCC"
       ],
-      "background": "Bradycardia = HR <60. Many people normal at 50–60. Intervention for SYMPTOMATIC bradycardia with inadequate perfusion, HR <20, or ventricular escape rhythms. Transcutaneous pacing not authorised for routine NEPT.",
+      "background": [
+        {
+          "text": "Bradycardia = HR <60. Many people normal at 50–60. Intervention for SYMPTOMATIC bradycardia with inadequate perfusion or HR <20. Confirm heart rate manually via pulse.",
+          "scopes": [
+            "PTO"
+          ]
+        },
+        {
+          "text": "Bradycardia = HR <60. Many people normal at 50–60. Intervention for SYMPTOMATIC bradycardia with inadequate perfusion, HR <20, or ventricular escape rhythms. Transcutaneous pacing not authorised for routine NEPT.",
+          "scopes": [
+            "EN",
+            "ATA",
+            "RN"
+          ]
+        },
+        {
+          "text": "Bradycardia = HR <60. Many people normal at 50–60. Intervention for SYMPTOMATIC bradycardia with inadequate perfusion, HR <20, or ventricular escape rhythms. Atropine may be ineffective for complete or 2nd degree type II heart block, but still administer. Transcutaneous pacing not authorised for routine NEPT.",
+          "scopes": [
+            "RNCC"
+          ]
+        }
+      ],
       "recognition": [
         {
           "text": "HR <60 bpm with symptoms of inadequate perfusion: hypotension, altered mentation",
@@ -13664,27 +13774,79 @@ const NEPT_EMBEDDED_DATA = {
               "label": "Unstable or symptomatic — requires intervention",
               "params": [
                 "⬤ Inadequate perfusion (hypotension, altered mentation)",
-                "⬤ HR < 20 regardless of perfusion",
-                "⬤ Persistent ventricular escape rhythms / runs of VT"
-              ]
+                "⬤ HR < 20 regardless of perfusion"
+              ],
+              "scope_params": {
+                "EN": [
+                  "⬤ Persistent ventricular escape rhythms / runs of VT"
+                ],
+                "ATA": [
+                  "⬤ Persistent ventricular escape rhythms / runs of VT"
+                ],
+                "RN": [
+                  "⬤ Persistent ventricular escape rhythms / runs of VT"
+                ],
+                "RNCC": [
+                  "⬤ Persistent ventricular escape rhythms / runs of VT"
+                ]
+              }
             },
             {
               "label": "Stable or asymptomatic",
               "params": [
-                "Continue clinical escalation or seek consult per CPP006",
-                "Monitor ECG continuously"
-              ]
+                "Continue clinical escalation or seek consult per CPP006"
+              ],
+              "scope_params": {
+                "EN": [
+                  "Monitor ECG continuously"
+                ],
+                "ATA": [
+                  "Monitor ECG continuously"
+                ],
+                "RN": [
+                  "Monitor ECG continuously"
+                ],
+                "RNCC": [
+                  "Monitor ECG continuously"
+                ],
+                "PTO": [
+                  "Monitor pulse rate, SpO₂, and BP continuously"
+                ]
+              }
             }
           ]
         },
         {
           "title": "🔴 Immediate Management",
           "priority": 1,
-          "params": [
-            "⬤ Escalate per CPP006 — clinical consult strongly recommended",
-            "Position patient appropriately",
-            "Continuous monitoring (ECG, SpO₂, BP)"
-          ]
+          "params": [],
+          "scope_params": {
+            "PTO": [
+              "⬤ Escalate per CPP006 — clinical consult strongly recommended",
+              "Position patient appropriately",
+              "Continuous monitoring (SpO₂, BP, manual pulse rate)"
+            ],
+            "EN": [
+              "⬤ Escalate per CPP006 — clinical consult strongly recommended",
+              "Position patient appropriately",
+              "Continuous monitoring (ECG, SpO₂, BP)"
+            ],
+            "ATA": [
+              "⬤ Escalate per CPP006 — clinical consult strongly recommended",
+              "Position patient appropriately",
+              "Continuous monitoring (ECG, SpO₂, BP)"
+            ],
+            "RN": [
+              "⬤ Escalate per CPP006 — clinical consult strongly recommended",
+              "Position patient appropriately",
+              "Continuous monitoring (ECG, SpO₂, BP)"
+            ],
+            "RNCC": [
+              "⬤ Escalate per CPP006 — clinical consult strongly recommended",
+              "Position patient appropriately",
+              "Continuous monitoring (ECG, SpO₂, BP)"
+            ]
+          }
         },
         {
           "title": "💊 Atropine",
@@ -17228,8 +17390,7 @@ const NEPT_EMBEDDED_DATA = {
         "CPP023",
         "CPP033",
         "CPP003",
-        "CPP008",
-        "CPP009",
+        "CPP008_009_PTO",
         "CPP010",
         "CPP013",
         "CPP014",
@@ -17260,20 +17421,6 @@ const NEPT_EMBEDDED_DATA = {
         "CPP018": {},
         "CPP023": {},
         "CPP033": {},
-        "CPP008": {
-          "recognition": [
-            "Symptoms: palpitations, dizziness, SOB, chest discomfort"
-          ]
-        },
-        "CPP009": {
-          "recognition": []
-        },
-        "CPP010": {
-          "recognition": [
-            "HR <60 bpm with symptoms of inadequate perfusion: hypotension, altered mentation",
-            "HR <20 regardless of perfusion"
-          ]
-        },
         "CPP013": {},
         "CPP014": {
           "medications_used": [],
@@ -25464,12 +25611,7 @@ const NEPT_EMBEDDED_DATA = {
           "next": []
         }
       ],
-      "scope_applicable": "__REMOVE__",
-      "action_cards": "__REMOVE__",
-      "recognition": [
-        "Heart rate >100 with QRS <0.12s on ECG",
-        "Symptoms: palpitations, dizziness, SOB, chest discomfort"
-      ]
+      "scope_applicable": "__REMOVE__"
     },
     "CPP009": {
       "decision_tree": [
@@ -25505,11 +25647,7 @@ const NEPT_EMBEDDED_DATA = {
           "next": []
         }
       ],
-      "scope_applicable": "__REMOVE__",
-      "action_cards": "__REMOVE__",
-      "recognition": [
-        "WCT: rate >100, QRS >0.12s, lasting >30s, regular, AV dissociation or no P waves"
-      ]
+      "scope_applicable": "__REMOVE__"
     },
     "CPP010": {
       "decision_tree": [
@@ -25538,14 +25676,7 @@ const NEPT_EMBEDDED_DATA = {
           "next": []
         }
       ],
-      "scope_applicable": "__REMOVE__",
-      "action_cards": "__REMOVE__",
-      "background": "Bradycardia = HR <60. Many people normal at 50–60. Intervention for SYMPTOMATIC bradycardia with inadequate perfusion, HR <20, or ventricular escape rhythms. Atropine may be ineffective for complete or 2nd degree type II heart block, but still administer. Transcutaneous pacing not authorised for routine NEPT.",
-      "recognition": [
-        "HR <60 bpm with symptoms of inadequate perfusion: hypotension, altered mentation",
-        "HR <20 regardless of perfusion",
-        "Persistent ventricular escape rhythms or runs of VT between bradycardia"
-      ]
+      "scope_applicable": "__REMOVE__"
     },
     "CPP011": {
       "risk_factors": "__REMOVE__",
@@ -27341,11 +27472,4 @@ function buildAgeWheel(id, unit, max, onchange) {
     </div>
     <div id="med-drawer-body">
       <div id="md-panel-dose" class="md-panel active"></div>
-      <div id="md-panel-ci" class="md-panel"></div>
-      <div id="md-panel-prec" class="md-panel"></div>
-      <div id="md-panel-se" class="md-panel"></div>
-    </div>
-  </div>
-</div>
-</body>
-</html>
+      <div i
