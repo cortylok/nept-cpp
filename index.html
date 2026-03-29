@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>NEPT CPP Reference — Beta V035</title>
+<title>NEPT CPP Reference — Beta V036</title>
 <script>
 // Kill any old service workers and clear caches (deferred to avoid InvalidStateError)
 if ('serviceWorker' in navigator) {
@@ -2017,7 +2017,7 @@ if ('serviceWorker' in navigator) {
     </div>
     <div class="splash-search-pill" onclick="enterApp();setTimeout(openSearchOverlay,300);">🔍 Search everything</div>
     <div class="splash-footer">
-      <span id="app-version-logo" style="display:block;margin-bottom:4px;font-weight:600;color:var(--text2);">Beta V035</span>
+      <span id="app-version-logo" style="display:block;margin-bottom:4px;font-weight:600;color:var(--text2);">Beta V036</span>
       Victorian Dept of Health · 2024<br>
       Clinical reference only — apply clinical judgement
     </div>
@@ -2074,7 +2074,7 @@ if ('serviceWorker' in navigator) {
   <button onclick="window.open('https://forms.gle/263ziiHoxq2DvTNS9','_blank');closeFeedbackModal();" style="width:100%;padding:14px;margin-bottom:10px;background:#1a73e8;border:none;border-radius:8px;color:#fff;font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;text-align:center;">📋 Open Feedback Form</button>
   <p style="font-family:var(--mono);font-size:10px;color:var(--text3);margin:0 0 10px 0;text-align:center;">Opens a short Google Form in a new tab</p>
   <div style="border-top:1px solid var(--border);margin:12px 0;"></div>
-  <a href="mailto:nept.app.feedback@gmail.com?subject=NEPT%20App%20Feedback" onclick="closeFeedbackModal();" style="display:block;width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;">✉️ Email Us Directly</a>
+  <a href="/cdn-cgi/l/email-protection#117f7461653f7061613f777474757370727a51767c70787d3f727e7c2e6264737b7472652c5f544145342321506161342321577474757370727a" onclick="closeFeedbackModal();" style="display:block;width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;">✉️ Email Us Directly</a>
   <p style="font-family:var(--mono);font-size:10px;color:var(--text3);margin:8px 0 0 0;text-align:center;">Opens your email app</p>
 </div>
 
@@ -2144,7 +2144,7 @@ if ('serviceWorker' in navigator) {
       <div style="font-family:var(--mono);font-size:13px;font-weight:500;flex:1;color:#e74c3c;">Exit</div>
     </div>
   </div>
-  <div style="padding:12px 18px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);font-family:var(--mono);line-height:1.5;" id="about-version-footer">NEPT CPP Reference App &middot; Beta V035<br>Victorian NEPT Clinical Practice Protocols 2024</div>
+  <div style="padding:12px 18px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);font-family:var(--mono);line-height:1.5;" id="about-version-footer">NEPT CPP Reference App &middot; Beta V036<br>Victorian NEPT Clinical Practice Protocols 2024</div>
 </div>
 
 
@@ -2189,7 +2189,7 @@ if ('serviceWorker' in navigator) {
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── DATA LOADING ─────────────────────────────────────────────────────────
 // Data is embedded directly for standalone use.
 let NEPT_DATA = null;
@@ -2686,7 +2686,7 @@ function showAboutPage() {
   var modeWrap = document.getElementById('mode-toggle-wrap');
   if (modeWrap) modeWrap.style.display = 'none';
 
-  var ver = 'Beta V035';
+  var ver = 'Beta V036';
   var h = '';
   h += '<div class="about-header">';
   h += '<div class="about-icon">📋</div>';
@@ -4102,45 +4102,78 @@ function openMiniPaedPad(target) {
   _miniPaedBuffer = '';
   var pad = document.getElementById('mini-paed-numpad');
   var label = document.getElementById('mini-numpad-label');
-  var valDiv = document.getElementById('mini-numpad-value');
   if (!pad) return;
-  label.textContent = target === 'age' ? ('Enter age (' + (_miniPaedAgeUnit === 'years' ? 'years' : 'months') + ')') : 'Enter weight (kg)';
-  valDiv.textContent = '0';
+  label.textContent = target === 'age' ? ('Entering age (' + (_miniPaedAgeUnit === 'years' ? 'years' : 'months') + ')') : 'Entering weight (kg)';
+  var ageDisp = document.getElementById('mini-paed-age-display');
+  var wtDisp = document.getElementById('mini-paed-wt-display');
+  if (ageDisp) ageDisp.style.borderColor = target === 'age' ? 'var(--accent)' : 'var(--border)';
+  if (wtDisp) wtDisp.style.borderColor = target === 'wt' ? 'var(--accent)' : 'var(--border)';
+  if (target === 'age') {
+    _miniPaedAge = null;
+    if (ageDisp) ageDisp.textContent = '_';
+  } else {
+    _miniPaedWt = null;
+    if (wtDisp) wtDisp.textContent = '_';
+  }
   pad.style.display = 'block';
   setTimeout(function() { pad.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
 }
 
 function miniPaedPadKey(key) {
-  var valDiv = document.getElementById('mini-numpad-value');
-  if (!valDiv) return;
+  if (!_miniPaedTarget) return;
+  var dispId = _miniPaedTarget === 'age' ? 'mini-paed-age-display' : 'mini-paed-wt-display';
+  var disp = document.getElementById(dispId);
+
   if (key === 'clear') {
     _miniPaedBuffer = '';
-    valDiv.textContent = '0';
+    if (_miniPaedTarget === 'age') { _miniPaedAge = null; if (disp) disp.textContent = '\u2014'; }
+    else { _miniPaedWt = null; if (disp) disp.textContent = '\u2014'; }
+    miniPaedCalc();
   } else if (key === 'del') {
     _miniPaedBuffer = _miniPaedBuffer.slice(0, -1);
-    valDiv.textContent = _miniPaedBuffer || '0';
-  } else if (key === 'done') {
-    var val = parseFloat(_miniPaedBuffer);
-    if (_miniPaedTarget === 'age' && !isNaN(val)) {
-      _miniPaedAge = val;
-      var disp = document.getElementById('mini-paed-age-display');
-      if (disp) disp.textContent = val + (_miniPaedAgeUnit === 'years' ? ' yrs' : ' mo');
-    } else if (_miniPaedTarget === 'wt' && !isNaN(val) && val > 0) {
-      _miniPaedWt = val;
-      var disp = document.getElementById('mini-paed-wt-display');
-      if (disp) disp.textContent = val + ' kg';
+    if (_miniPaedBuffer === '') {
+      if (_miniPaedTarget === 'age') { _miniPaedAge = null; if (disp) disp.textContent = '_'; }
+      else { _miniPaedWt = null; if (disp) disp.textContent = '_'; }
+    } else {
+      var val = parseFloat(_miniPaedBuffer);
+      if (_miniPaedTarget === 'age') {
+        _miniPaedAge = val;
+        if (disp) disp.textContent = _miniPaedBuffer + (_miniPaedAgeUnit === 'years' ? ' yrs' : ' mo');
+      } else {
+        _miniPaedWt = val;
+        if (disp) disp.textContent = _miniPaedBuffer + ' kg';
+      }
+      miniPaedCalc();
     }
+  } else if (key === 'done') {
     document.getElementById('mini-paed-numpad').style.display = 'none';
+    var ageDisp = document.getElementById('mini-paed-age-display');
+    var wtDisp = document.getElementById('mini-paed-wt-display');
+    if (ageDisp) ageDisp.style.borderColor = 'var(--border)';
+    if (wtDisp) wtDisp.style.borderColor = 'var(--border)';
+    if (_miniPaedBuffer === '' || _miniPaedBuffer === '0') {
+      if (_miniPaedTarget === 'age') { _miniPaedAge = null; if (ageDisp) ageDisp.textContent = '\u2014'; }
+      else { _miniPaedWt = null; if (wtDisp) wtDisp.textContent = '\u2014'; }
+    }
+    _miniPaedTarget = null;
     miniPaedCalc();
   } else if (key === '.') {
     if (_miniPaedBuffer.indexOf('.') === -1) {
       _miniPaedBuffer += _miniPaedBuffer ? '.' : '0.';
-      valDiv.textContent = _miniPaedBuffer;
+      if (disp) disp.textContent = _miniPaedBuffer + (_miniPaedTarget === 'age' ? (_miniPaedAgeUnit === 'years' ? ' yrs' : ' mo') : ' kg');
     }
   } else {
     if (_miniPaedBuffer === '0') _miniPaedBuffer = '';
     _miniPaedBuffer += key;
-    valDiv.textContent = _miniPaedBuffer;
+    var val = parseFloat(_miniPaedBuffer);
+    if (_miniPaedTarget === 'age' && !isNaN(val)) {
+      _miniPaedAge = val;
+      if (disp) disp.textContent = _miniPaedBuffer + (_miniPaedAgeUnit === 'years' ? ' yrs' : ' mo');
+    } else if (_miniPaedTarget === 'wt' && !isNaN(val)) {
+      _miniPaedWt = val;
+      if (disp) disp.textContent = _miniPaedBuffer + ' kg';
+    }
+    miniPaedCalc();
   }
 }
 
@@ -4150,6 +4183,10 @@ function miniPaedCalc() {
   
   var weightKg = null;
   var source = '';
+  var hasAge = (_miniPaedAge !== null && _miniPaedAge >= 0);
+  var hasWeight = (_miniPaedWt && _miniPaedWt > 0);
+  var weightIsKnown = false;
+  var ageMonths = null;
   
   var vss = [
     ['Newborn', 3.5, '60-95', '120-185', '25-60'],
@@ -4165,63 +4202,91 @@ function miniPaedCalc() {
   ];
   
   var ageLabel = '';
-  if (_miniPaedWt && _miniPaedWt > 0) {
-    weightKg = _miniPaedWt;
-    source = 'Known weight';
-  } else if (_miniPaedAge !== null && _miniPaedAge >= 0) {
-    var ageMonths = _miniPaedAgeUnit === 'years' ? _miniPaedAge * 12 : _miniPaedAge;
+  
+  if (hasAge) {
+    ageMonths = _miniPaedAgeUnit === 'years' ? _miniPaedAge * 12 : _miniPaedAge;
     ageLabel = _miniPaedAge + (_miniPaedAgeUnit === 'years' ? ' yr' : ' mo');
+    
     if (ageMonths >= 144) {
-      // ≥12 years = adult — still show doses
-      weightKg = Math.min(80, Math.round(ageMonths / 12 * 3.3));
-      source = 'Adult (≥12 yr) · est. from ' + ageLabel;
-    } else if (ageMonths < 1) weightKg = 3.5;
+      var h = '<div style="text-align:center;padding:20px 12px;">';
+      h += '<div style="font-size:22px;margin-bottom:10px;">\u{1f464}</div>';
+      h += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">\u2265 12 years = Adult</div>';
+      h += '<div style="font-size:13px;color:var(--text2);line-height:1.6;">Manage as adult cardiac arrest \u2014 <a onclick="jumpToProtocol(\'CPP004\');return false;" href="#" style="color:var(--accent);text-decoration:underline;cursor:pointer;font-weight:600;">CPP004</a></div>';
+      h += '</div>';
+      resultDiv.innerHTML = h;
+      resultDiv.style.display = 'block';
+      return;
+    }
+  }
+  
+  if (hasWeight) {
+    weightKg = _miniPaedWt;
+    weightIsKnown = true;
+    
+    if (weightKg > 40 && !hasAge) {
+      var h = '<div style="text-align:center;padding:20px 12px;">';
+      h += '<div style="font-size:22px;margin-bottom:10px;">\u{1f464}</div>';
+      h += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">' + weightKg.toFixed(1) + ' kg</div>';
+      h += '<div style="font-size:13px;color:var(--text2);line-height:1.6;">If the child is under 12 years of age, consult with a clinician regarding dosages.<br>If over 12, treat per adult protocols.</div>';
+      h += '</div>';
+      resultDiv.innerHTML = h;
+      resultDiv.style.display = 'block';
+      return;
+    }
+  }
+  
+  if (!hasWeight && hasAge) {
+    if (ageMonths < 1) weightKg = 3.5;
     else if (ageMonths < 3) weightKg = 6;
     else if (ageMonths < 12) weightKg = 8;
     else if (ageMonths < 48) weightKg = Math.round((ageMonths / 12 * 2 + 8) * 10) / 10;
     else { weightKg = Math.round(ageMonths / 12 * 3.3 * 10) / 10; }
-    if (!source) source = 'Est. from ' + ageLabel;
+    source = 'Est. from ' + ageLabel;
+  } else if (hasWeight && hasAge) {
+    source = 'Known \u00b7 ' + ageLabel;
+  } else if (hasWeight) {
+    source = 'Known weight';
   }
   
   if (!weightKg) { resultDiv.style.display = 'none'; return; }
   
-  var miniIsAdult = (source && source.indexOf('Adult') !== -1);
   var row = vss[0], minD = 999;
-  vss.forEach(function(r) { var d = Math.abs(r[1] - weightKg); if (d < minD) { minD = d; row = r; } });
-  
-  var joules = miniIsAdult ? 200 : Math.min(200, Math.round(weightKg * 4));
-  
-  // For ≥12 years in mini calc, show adult redirect message
-  if (miniIsAdult) {
-    var h = '<div style="text-align:center;padding:20px 12px;">';
-    h += '<div style="font-size:22px;margin-bottom:10px;">👤</div>';
-    h += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">≥12 years = Adult</div>';
-    h += '<div style="font-size:13px;color:var(--text2);line-height:1.6;">Manage as adult cardiac arrest — <a onclick="jumpToProtocol(\'CPP004\');return false;" href="#" style="color:var(--accent);text-decoration:underline;cursor:pointer;font-weight:600;">CPP004</a></div>';
-    h += '</div>';
-    resultDiv.innerHTML = h;
-    resultDiv.style.display = 'block';
-    return;
+  if (hasAge) {
+    var ageLookup = [0, 3, 6, 12, 24, 48, 72, 96, 120, 144];
+    ageLookup.forEach(function(am, i) {
+      var d = Math.abs(ageMonths - am);
+      if (d < minD) { minD = d; row = vss[i]; }
+    });
+  } else {
+    vss.forEach(function(r) { var d = Math.abs(r[1] - weightKg); if (d < minD) { minD = d; row = r; } });
   }
+  
+  var joules = Math.min(200, Math.round(weightKg * 4));
+  
+  var miniAgeMonths = ageMonths;
+  var cprText = '';
+  if (miniAgeMonths !== null && miniAgeMonths < 1) {
+    cprText = '<strong>Newborn (birth–24h):</strong> 90/min · 2-finger or 2-thumb · 1/3 chest depth';
+    cprText += '<ul style="margin:4px 0 0 14px;padding:0;list-style:disc;font-size:11px;line-height:1.6;color:var(--text2);">';
+    cprText += '<li>No SGA: 3:1 ratio</li></ul>';
+  } else if ((miniAgeMonths !== null && miniAgeMonths < 12) || (miniAgeMonths === null && weightKg <= 8)) {
+    cprText = '<strong>Infant (1 day–1 yr):</strong> 100–120/min · 2-thumb encircling or 2-finger · 1/3 chest';
+    cprText += '<ul style="margin:4px 0 0 14px;padding:0;list-style:disc;font-size:11px;line-height:1.6;color:var(--text2);">';
+    cprText += '<li>No SGA (OPA/BVM): 30:2 — pause for ventilations</li>';
+    cprText += '<li>SGA or ETT in situ: 15:1 — no pause for ventilations</li></ul>';
+  } else {
+    cprText = '<strong>Child (1–11 yrs):</strong> 100–120/min · 1 or 2 hands · 1/3 chest';
+    cprText += '<ul style="margin:4px 0 0 14px;padding:0;list-style:disc;font-size:11px;line-height:1.6;color:var(--text2);">';
+    cprText += '<li>No SGA (OPA/BVM): 30:2 — pause for ventilations</li>';
+    cprText += '<li>SGA or ETT in situ: 15:1 — no pause for ventilations</li></ul>';
+  }
+  if (!hasAge && hasWeight) cprText += '<div style="font-size:10px;color:var(--text3);margin-top:4px;">(estimated from weight — enter age for accuracy)</div>';
 
   var cardStyle = 'border-radius:8px;padding:12px;text-align:center;';
   var raisedStyle = 'border-top:1px solid rgba(255,255,255,0.18);border-left:1px solid rgba(255,255,255,0.14);border-right:1px solid rgba(0,0,0,0.3);border-bottom:2px solid rgba(0,0,0,0.35);box-shadow:0 2px 4px rgba(0,0,0,0.4);';
   
-  // Determine age group for CPR technique
-  var miniAgeMonths = null;
-  if (_miniPaedAge !== null && _miniPaedAgeUnit) {
-    miniAgeMonths = _miniPaedAgeUnit === 'years' ? _miniPaedAge * 12 : _miniPaedAge;
-  }
-  var cprText = '';
-  if (miniAgeMonths !== null && miniAgeMonths < 1) {
-    cprText = '<strong>Newborn (birth–24h):</strong> 3:1 (no SGA) · 90/min · 2-finger or 2-thumb · 1/3 chest depth';
-  } else if ((miniAgeMonths !== null && miniAgeMonths < 12) || (miniAgeMonths === null && weightKg <= 8)) {
-    cprText = '<strong>Infant (1 day–1 yr):</strong> 30:2 (no SGA) or 15:1 (SGA/ETT) · 100–120/min · 2-thumb encircling or 2-finger · 1/3 chest';
-  } else {
-    cprText = '<strong>Child (1–11 yrs):</strong> 30:2 (no SGA) or 15:1 (SGA/ETT) · 100–120/min · 1 or 2 hands · 1/3 chest';
-  }
-  
   var h = '<div style="' + cardStyle + raisedStyle + 'background:linear-gradient(180deg,rgba(59,130,246,0.1),rgba(59,130,246,0.03));text-align:left;margin-bottom:8px;">';
-  h += '<div style="font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">🫀 CPR Technique</div>';
+  h += '<div style="font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">\u{1fac0} CPR Technique</div>';
   h += '<div style="font-size:12px;color:var(--text);line-height:1.6;">' + cprText + '</div>';
   h += '</div>';
 
@@ -4234,32 +4299,40 @@ function miniPaedCalc() {
   h += '</div>';
   
   h += '<div style="' + cardStyle + raisedStyle + 'background:linear-gradient(180deg,rgba(234,179,8,0.12),rgba(234,179,8,0.04));">';
-  h += '<div style="font-size:12px;color:var(--yellow);font-weight:600;text-transform:uppercase;letter-spacing:1px;">⚡ Defib</div>';
+  h += '<div style="font-size:12px;color:var(--yellow);font-weight:600;text-transform:uppercase;letter-spacing:1px;">\u26a1 Defib</div>';
   if (currentScope === 'PTO') {
     h += '<div style="font-size:14px;font-weight:700;color:var(--text);margin:6px 0;">AED only</div>';
     h += '<div style="font-size:10px;color:var(--text2);line-height:1.3;">Paed pads if available. Otherwise adult AED until help arrives.</div>';
   } else {
     h += '<div style="font-size:24px;font-weight:800;color:var(--yellow);margin:6px 0;">' + joules + ' <span style="font-size:14px;font-weight:500;">J</span></div>';
-    h += '<div style="font-size:12px;color:var(--text2);">4 J/kg · round UP</div>';
+    h += '<div style="font-size:12px;color:var(--text2);">4 J/kg \u00b7 round UP' + (weightIsKnown ? '' : ' (est.)') + '</div>';
   }
   h += '</div>';
   
-  h += '<div style="' + cardStyle + raisedStyle + 'background:linear-gradient(180deg,rgba(239,68,68,0.08),rgba(239,68,68,0.02));">';
-  h += '<div style="font-size:12px;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:1px;">🫀 Heart Rate</div>';
-  h += '<div style="font-size:24px;font-weight:800;color:var(--text);margin:6px 0;">' + row[3] + '</div>';
-  h += '<div style="font-size:12px;color:var(--text2);">bpm · normal range</div>';
+  if (hasAge) {
+    h += '<div style="' + cardStyle + raisedStyle + 'background:linear-gradient(180deg,rgba(239,68,68,0.08),rgba(239,68,68,0.02));">';
+    h += '<div style="font-size:12px;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:1px;">\u{1fac0} Heart Rate</div>';
+    h += '<div style="font-size:24px;font-weight:800;color:var(--text);margin:6px 0;">' + row[3] + '</div>';
+    h += '<div style="font-size:12px;color:var(--text2);">bpm \u00b7 normal range</div>';
+    h += '</div>';
+    
+    h += '<div style="' + cardStyle + raisedStyle + 'background:linear-gradient(180deg,rgba(59,130,246,0.08),rgba(59,130,246,0.02));">';
+    h += '<div style="font-size:12px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:1px;">\u{1fab1} Resp Rate</div>';
+    h += '<div style="font-size:24px;font-weight:800;color:var(--text);margin:6px 0;">' + row[4] + '</div>';
+    h += '<div style="font-size:12px;color:var(--text2);">breaths/min \u00b7 normal</div>';
+    h += '</div>';
+  }
+  
   h += '</div>';
   
-  h += '<div style="' + cardStyle + raisedStyle + 'background:linear-gradient(180deg,rgba(59,130,246,0.08),rgba(59,130,246,0.02));">';
-  h += '<div style="font-size:12px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:1px;">🫁 Resp Rate</div>';
-  h += '<div style="font-size:24px;font-weight:800;color:var(--text);margin:6px 0;">' + row[4] + '</div>';
-  h += '<div style="font-size:12px;color:var(--text2);">breaths/min · normal</div>';
-  h += '</div>';
+  if (!hasAge) {
+    h += '<div style="text-align:center;padding:8px;font-size:11px;color:var(--text3);line-height:1.5;">Enter age for vital sign ranges</div>';
+  }
   
-  h += '</div>';
   resultDiv.innerHTML = h;
   resultDiv.style.display = 'block';
 }
+
 
 
 function toggleDashCard(el) {
@@ -4482,7 +4555,6 @@ function renderProtocol(p) {
       // Numpad overlay (hidden)
       html += '<div id="mini-paed-numpad" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:12px;max-width:260px;margin-left:auto;margin-right:auto;">';
       html += '<div id="mini-numpad-label" style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;text-align:center;">Enter value</div>';
-      html += '<div id="mini-numpad-value" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--text);text-align:center;padding:6px;margin-bottom:8px;background:var(--bg);border-radius:6px;border:1px solid var(--border);min-height:38px;">0</div>';
       html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">';
       var numBtnStyle = "style=\"padding:10px 0;border-radius:6px;font-family:var(--mono);font-size:16px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.02));border-top:1px solid rgba(255,255,255,0.18);border-left:1px solid rgba(255,255,255,0.14);border-right:1px solid rgba(0,0,0,0.3);border-bottom:2px solid rgba(0,0,0,0.35);box-shadow:0 2px 4px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.08);color:var(--text);\"";
       for (var d = 1; d <= 9; d++) {
@@ -4888,25 +4960,27 @@ function renderPaedCalc() {
   var html = '<div class="paed-calc">';
   html += '<div class="paed-calc-header"><div class="paed-calc-icon">👶</div><div><div class="paed-calc-title">Paediatric Weight & Drug Calculator</div><div class="paed-calc-sub">NEPT CPP 2024 · Tables 5, 6, CPP005, CPP029</div></div></div>';
 
+  // Info text
+  html += '<div style="font-size:11px;color:var(--text3);line-height:1.6;padding:0 4px 12px;text-align:center;">Enter age, weight, or both. Age determines vital sign ranges and CPR technique. Weight determines drug doses and defibrillation energy. When both are entered, known weight takes precedence for dosing.</div>';
+
   // Age unit toggle
   html += '<div style="display:flex;gap:6px;justify-content:center;margin-bottom:12px;">';
   html += '<button id="full-paed-yr-btn" onclick="fullPaedToggleUnit(\'years\')" style="padding:6px 16px;border-radius:6px;border:1px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;">Years</button>';
   html += '<button id="full-paed-mo-btn" onclick="fullPaedToggleUnit(\'months\')" style="padding:6px 16px;border-radius:6px;border:1px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;background:var(--bg3);color:var(--text3);">Months</button>';
   html += '</div>';
 
-  // Input buttons - same style as CPP005 mini
+  // Input buttons - both allowed
   html += '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;">';
   html += '<div style="text-align:center;"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Age</div>';
   html += '<div id="full-paed-age-display" onclick="openFullPaedPad(\'age\')" style="width:100px;height:44px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);cursor:pointer;">—</div></div>';
-  html += '<div style="font-size:12px;color:var(--text3);align-self:flex-end;padding-bottom:12px;">or</div>';
+  html += '<div style="font-size:12px;color:var(--text3);align-self:flex-end;padding-bottom:12px;">and / or</div>';
   html += '<div style="text-align:center;"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Known Weight</div>';
   html += '<div id="full-paed-wt-display" onclick="openFullPaedPad(\'wt\')" style="width:100px;height:44px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);cursor:pointer;">—</div></div>';
   html += '</div>';
 
-  // Numpad
+  // Numpad - digits enter directly into the active field
   html += '<div id="full-paed-numpad" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:12px;max-width:260px;margin-left:auto;margin-right:auto;">';
   html += '<div id="full-numpad-label" style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;text-align:center;">Enter value</div>';
-  html += '<div id="full-numpad-value" style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--text);text-align:center;padding:6px;margin-bottom:8px;background:var(--bg);border-radius:6px;border:1px solid var(--border);min-height:38px;">0</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">';
   [1,2,3,4,5,6,7,8,9,'.',0,'del'].forEach(function(k) {
     var label = k === 'del' ? '⌫' : k;
@@ -4945,97 +5019,163 @@ function openFullPaedPad(target) {
   _fullPaedBuffer = '';
   var pad = document.getElementById('full-paed-numpad');
   var label = document.getElementById('full-numpad-label');
-  var valDiv = document.getElementById('full-numpad-value');
   if (!pad) return;
-  label.textContent = target === 'age' ? ('Enter age (' + (_miniPaedAgeUnit === 'years' ? 'years' : 'months') + ')') : 'Enter weight (kg)';
-  valDiv.textContent = '0';
+  label.textContent = target === 'age' ? ('Entering age (' + (_miniPaedAgeUnit === 'years' ? 'years' : 'months') + ')') : 'Entering weight (kg)';
+  // Highlight active field
+  var ageDisp = document.getElementById('full-paed-age-display');
+  var wtDisp = document.getElementById('full-paed-wt-display');
+  if (ageDisp) ageDisp.style.borderColor = target === 'age' ? 'var(--accent)' : 'var(--border)';
+  if (wtDisp) wtDisp.style.borderColor = target === 'wt' ? 'var(--accent)' : 'var(--border)';
+  // Reset the display for the target field
+  if (target === 'age') {
+    _miniPaedAge = null;
+    if (ageDisp) ageDisp.textContent = '_';
+  } else {
+    _miniPaedWt = null;
+    if (wtDisp) wtDisp.textContent = '_';
+  }
   pad.style.display = 'block';
   setTimeout(function() { pad.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
 }
 
 function fullPaedPadKey(key) {
-  var valDiv = document.getElementById('full-numpad-value');
-  if (!valDiv) return;
+  if (!_fullPaedTarget) return;
+  var dispId = _fullPaedTarget === 'age' ? 'full-paed-age-display' : 'full-paed-wt-display';
+  var disp = document.getElementById(dispId);
+
   if (key === 'clear') {
     _fullPaedBuffer = '';
-    valDiv.textContent = '0';
+    if (_fullPaedTarget === 'age') {
+      _miniPaedAge = null;
+      if (disp) disp.textContent = '—';
+    } else {
+      _miniPaedWt = null;
+      if (disp) disp.textContent = '—';
+    }
+    fullPaedRunCalc();
   } else if (key === 'del') {
     _fullPaedBuffer = _fullPaedBuffer.slice(0, -1);
-    valDiv.textContent = _fullPaedBuffer || '0';
-  } else if (key === 'done') {
-    var val = parseFloat(_fullPaedBuffer);
-    if (_fullPaedTarget === 'age' && !isNaN(val)) {
-      _miniPaedAge = val;
-      _miniPaedWt = null;
-      var disp = document.getElementById('full-paed-age-display');
-      if (disp) disp.textContent = val + (_miniPaedAgeUnit === 'years' ? ' yrs' : ' mo');
-      var wtDisp = document.getElementById('full-paed-wt-display');
-      if (wtDisp) wtDisp.textContent = '—';
-    } else if (_fullPaedTarget === 'wt' && !isNaN(val) && val > 0) {
-      _miniPaedWt = val;
-      _miniPaedAge = null;
-      var disp = document.getElementById('full-paed-wt-display');
-      if (disp) disp.textContent = val + ' kg';
-      var ageDisp = document.getElementById('full-paed-age-display');
-      if (ageDisp) ageDisp.textContent = '—';
+    if (_fullPaedBuffer === '') {
+      if (_fullPaedTarget === 'age') { _miniPaedAge = null; if (disp) disp.textContent = '_'; }
+      else { _miniPaedWt = null; if (disp) disp.textContent = '_'; }
+    } else {
+      var val = parseFloat(_fullPaedBuffer);
+      if (_fullPaedTarget === 'age') {
+        _miniPaedAge = val;
+        if (disp) disp.textContent = _fullPaedBuffer + (_miniPaedAgeUnit === 'years' ? ' yrs' : ' mo');
+      } else {
+        _miniPaedWt = val;
+        if (disp) disp.textContent = _fullPaedBuffer + ' kg';
+      }
+      fullPaedRunCalc();
     }
+  } else if (key === 'done') {
+    // Close numpad
     document.getElementById('full-paed-numpad').style.display = 'none';
+    var ageDisp = document.getElementById('full-paed-age-display');
+    var wtDisp = document.getElementById('full-paed-wt-display');
+    if (ageDisp) ageDisp.style.borderColor = 'var(--border)';
+    if (wtDisp) wtDisp.style.borderColor = 'var(--border)';
+    // Clean up empty entries
+    if (_fullPaedBuffer === '' || _fullPaedBuffer === '0') {
+      if (_fullPaedTarget === 'age') { _miniPaedAge = null; if (ageDisp) ageDisp.textContent = '—'; }
+      else { _miniPaedWt = null; if (wtDisp) wtDisp.textContent = '—'; }
+    }
+    _fullPaedTarget = null;
     fullPaedRunCalc();
   } else if (key === '.') {
     if (_fullPaedBuffer.indexOf('.') === -1) {
       _fullPaedBuffer += _fullPaedBuffer ? '.' : '0.';
-      valDiv.textContent = _fullPaedBuffer;
+      if (disp) disp.textContent = _fullPaedBuffer + (_fullPaedTarget === 'age' ? (_miniPaedAgeUnit === 'years' ? ' yrs' : ' mo') : ' kg');
     }
   } else {
     if (_fullPaedBuffer === '0') _fullPaedBuffer = '';
     _fullPaedBuffer += key;
-    valDiv.textContent = _fullPaedBuffer;
+    var val = parseFloat(_fullPaedBuffer);
+    if (_fullPaedTarget === 'age' && !isNaN(val)) {
+      _miniPaedAge = val;
+      if (disp) disp.textContent = _fullPaedBuffer + (_miniPaedAgeUnit === 'years' ? ' yrs' : ' mo');
+    } else if (_fullPaedTarget === 'wt' && !isNaN(val)) {
+      _miniPaedWt = val;
+      if (disp) disp.textContent = _fullPaedBuffer + ' kg';
+    }
+    fullPaedRunCalc();
   }
 }
 
 function fullPaedRunCalc() {
-  // Delegate to the existing paedCalcUpdate logic but with mini paed vars
   var weightKg = null;
   var ageMonths = null;
   var ageLabel = '';
   var ageGroup = '';
+  var hasAge = (_miniPaedAge !== null && _miniPaedAge >= 0);
+  var hasWeight = (_miniPaedWt && _miniPaedWt > 0);
+  var weightSource = ''; // 'known' or 'estimated'
 
-  if (_miniPaedWt && _miniPaedWt > 0) {
-    weightKg = _miniPaedWt;
-    ageLabel = 'Known weight: ' + _miniPaedWt.toFixed(1) + ' kg';
-    if (weightKg <= 4) ageGroup = 'newborn';
-    else if (weightKg <= 6) ageGroup = 'small_infant';
-    else if (weightKg <= 10) ageGroup = 'large_infant';
-    else if (weightKg <= 20) ageGroup = 'small_child';
-    else ageGroup = 'medium_child';
-  } else if (_miniPaedAge !== null && _miniPaedAge >= 0) {
+  // Resolve age if entered
+  if (hasAge) {
     ageMonths = _miniPaedAgeUnit === 'years' ? _miniPaedAge * 12 : _miniPaedAge;
     ageLabel = _miniPaedAge + ' ' + _miniPaedAgeUnit;
     if (ageMonths >= 144) {
-      // ≥12 years = adult per CPP005 — show adult dosages
       ageGroup = 'adult';
-      weightKg = Math.min(80, Math.round(ageMonths/12 * 3.3));
-    }
-    else if (ageMonths < 0.1) { ageGroup = 'newborn'; weightKg = 3.5; }
-    else if (ageMonths < 3) { ageGroup = 'small_infant'; weightKg = 6; }
-    else if (ageMonths < 12) { ageGroup = 'large_infant'; weightKg = 8; }
-    else if (ageMonths < 48) { ageGroup = 'small_child'; weightKg = Math.round(((ageMonths/12) * 2 + 8) * 10) / 10; }
-    else { ageGroup = 'medium_child'; weightKg = Math.round((ageMonths/12) * 3.3 * 10) / 10; }
+    } else if (ageMonths < 0.1) { ageGroup = 'newborn'; }
+    else if (ageMonths < 3) { ageGroup = 'small_infant'; }
+    else if (ageMonths < 12) { ageGroup = 'large_infant'; }
+    else if (ageMonths < 48) { ageGroup = 'small_child'; }
+    else { ageGroup = 'medium_child'; }
   }
 
-  if (weightKg === null) { document.getElementById('paed-calc-result').style.display = 'none'; return; }
+  // Resolve weight
+  if (hasWeight) {
+    weightKg = _miniPaedWt;
+    weightSource = 'known';
+    // Weight >40kg without age → clinician/adult message
+    if (weightKg > 40 && !hasAge) {
+      var el = document.getElementById('paed-calc-result');
+      el.style.display = 'block';
+      el.innerHTML = '<div class="paed-result"><div style="background:rgba(74,144,217,0.08);border:1px solid rgba(74,144,217,0.25);border-radius:10px;padding:16px;text-align:center;">' +
+        '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">👤 ' + weightKg.toFixed(1) + ' kg</div>' +
+        '<div style="font-size:13px;color:var(--text2);line-height:1.6;">If the child is under 12 years of age, consult with a clinician regarding dosages.<br>If over 12, treat per adult protocols.</div>' +
+        '</div></div>';
+      return;
+    }
+    // If no age, estimate age group from weight for CPR technique
+    if (!hasAge) {
+      if (weightKg <= 4) ageGroup = 'newborn';
+      else if (weightKg <= 6) ageGroup = 'small_infant';
+      else if (weightKg <= 10) ageGroup = 'large_infant';
+      else if (weightKg <= 20) ageGroup = 'small_child';
+      else ageGroup = 'medium_child';
+    }
+  } else if (hasAge) {
+    // Age only — estimate weight
+    weightSource = 'estimated';
+    if (ageGroup === 'adult') {
+      weightKg = Math.min(80, Math.round(ageMonths / 12 * 3.3));
+    } else if (ageMonths < 0.1) { weightKg = 3.5; }
+    else if (ageMonths < 3) { weightKg = 6; }
+    else if (ageMonths < 12) { weightKg = 8; }
+    else if (ageMonths < 48) { weightKg = Math.round(((ageMonths / 12) * 2 + 8) * 10) / 10; }
+    else { weightKg = Math.round((ageMonths / 12) * 3.3 * 10) / 10; }
+  }
 
-  // Inject weight into the old paedCalcUpdate path by faking the inputs
-  // Actually just call the rendering directly using the same output logic
-  var el = document.getElementById('paed-calc-result');
-  // Store for paedCalcUpdate to use
-  window._fullPaedWeightKg = weightKg;
-  window._fullPaedAgeLabel = ageLabel;
-  window._fullPaedAgeGroup = ageGroup;
-  paedCalcUpdateFull(weightKg, ageLabel, ageGroup, ageMonths);
+  if (weightKg === null && !hasAge) { document.getElementById('paed-calc-result').style.display = 'none'; return; }
+
+  // ≥12 age → adult message (regardless of weight)
+  if (ageGroup === 'adult') {
+    var el = document.getElementById('paed-calc-result');
+    el.style.display = 'block';
+    el.innerHTML = '<div class="paed-result"><div style="background:rgba(74,144,217,0.08);border:1px solid rgba(74,144,217,0.25);border-radius:10px;padding:16px;text-align:center;">' +
+      '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">👤 ' + ageLabel + '</div>' +
+      '<div style="font-size:13px;color:var(--text2);line-height:1.6;">In the context of these CPPs, ≥12 years of age is considered adult.<br>If unsure about management or dosages, refer to clinician for advice.</div>' +
+      '</div></div>';
+    return;
+  }
+
+  paedCalcUpdateFull(weightKg, ageLabel, ageGroup, ageMonths, weightSource, hasAge, hasWeight);
 }
 
-function paedCalcUpdateFull(weightKg, ageLabel, ageGroup, ageMonths) {
+function paedCalcUpdateFull(weightKg, ageLabel, ageGroup, ageMonths, weightSource, hasAge, hasWeight) {
 
   // VSS lookup table [age_label, weight, sbp_range, hr_range, rr_range]
   var vssTable = [
@@ -5050,26 +5190,45 @@ function paedCalcUpdateFull(weightKg, ageLabel, ageGroup, ageMonths) {
     ['10 years',      30,   '85–120', '60–130',   '15–25'],
     ['12 years',      40,   '90–120', '65–120',   '15–25']
   ];
-  // Find closest VSS row
+  // Find closest VSS row by age if available, otherwise by weight
   var vss = vssTable[0];
-  var minDiff = 999;
-  vssTable.forEach(function(row) {
-    var diff = Math.abs(row[1] - weightKg);
-    if (diff < minDiff) { minDiff = diff; vss = row; }
-  });
+  if (hasAge && ageMonths !== null) {
+    // Match by age
+    var ageLookup = [
+      [0, 0], [3, 1], [6, 2], [12, 3], [24, 4], [48, 5], [72, 6], [96, 7], [120, 8], [144, 9]
+    ];
+    var bestIdx = 0;
+    var minD = 999;
+    ageLookup.forEach(function(pair) {
+      var d = Math.abs(ageMonths - pair[0]);
+      if (d < minD) { minD = d; bestIdx = pair[1]; }
+    });
+    vss = vssTable[bestIdx];
+  } else {
+    var minDiff = 999;
+    vssTable.forEach(function(row) {
+      var diff = Math.abs(row[1] - weightKg);
+      if (diff < minDiff) { minDiff = diff; vss = row; }
+    });
+  }
 
   // Calculations
   var isAdult = (ageGroup === 'adult');
   var defibJ = isAdult ? 200 : Math.min(200, Math.round(weightKg * 4));
-  var defibDisplay = isAdult ? '200 J (adult dose)' : defibJ + ' J (4 J/kg — round UP to nearest setting, max 200 J)';
+  var defibDisplay = isAdult ? '200 J (adult dose)' : defibJ + ' J (4 J/kg' + (defibCapped ? ' — capped at adult dose' : ' — round UP to nearest setting, max 200 J') + ')';
 
   // Drug doses — adult overrides for ≥12 years
   var paracetamol_mg = isAdult ? 1000 : Math.round(weightKg * 15);
   var paracetamol_max = Math.min(paracetamol_mg, 1000);
-  var adr_im_mcg = isAdult ? 500 : Math.round(weightKg * 10);
+  var paracetamol_capped = (!isAdult && paracetamol_mg > 1000);
+  var adr_im_mcg = isAdult ? 500 : Math.min(500, Math.round(weightKg * 10));
+  var adr_im_capped = (!isAdult && Math.round(weightKg * 10) > 500);
   var adr_im_mg  = isAdult ? 0.5 : Math.min(0.5, Math.round(weightKg * 0.01 * 100) / 100);
   var adr_im_ml  = adr_im_mg.toFixed(2); // 1:1000 = 1mg/mL
-  var adr_iv_mg = isAdult ? '1.00' : (weightKg * 0.01).toFixed(2);
+  var adr_iv_mg = isAdult ? '1.00' : Math.min(1.0, weightKg * 0.01).toFixed(2);
+  var adr_iv_capped = (!isAdult && weightKg * 0.01 > 1.0);
+  var defibCapped = (!isAdult && Math.round(weightKg * 4) > 200);
+  var capLabel = ' <span style="font-size:10px;color:var(--orange);font-weight:400;">(capped at adult dose)</span>';
   var salb_puff;
   if (isAdult) salb_puff = '4–12 puffs';
   else if (ageMonths !== null && ageMonths < 24) salb_puff = '2–4 puffs (infant/toddler)';
@@ -5093,12 +5252,32 @@ function paedCalcUpdateFull(weightKg, ageLabel, ageGroup, ageMonths) {
   var gluc_paste_g = 15; // Always one tube: 37.5g gel containing 15g glucose
   var methox_ml = isAdult ? '3 mL' : (weightKg >= 20 ? '3 mL' : (weightKg >= 10 ? '1.5–3 mL' : 'Not recommended <10kg'));
 
-  // CPR technique - corrected with airway adjunct context instead of rescuer count
+  // CPR technique - rate/technique/depth first, then ventilation ratios as dot points
   var cprTech = '';
-  if (ageGroup === 'adult') cprTech = '<strong>Adult:</strong> 30:2 (no SGA) or 15:1 (SGA/ETT) · 100–120/min · 2 hands · ≥5 cm depth · Full recoil';
-  else if (ageGroup === 'newborn') cprTech = '<strong>Newborn (birth–24h):</strong> 3:1 (no SGA) · 90/min · 2-finger or 2-thumb · 1/3 chest depth';
-  else if (ageGroup === 'small_infant' || ageGroup === 'large_infant') cprTech = '<strong>Infant (1 day–1 yr):</strong> 30:2 (no SGA) or 15:1 (SGA/ETT) · 100–120/min · 2-thumb encircling or 2-finger · 1/3 chest';
-  else cprTech = '<strong>Child (1–11 yrs):</strong> 30:2 (no SGA) or 15:1 (SGA/ETT) · 100–120/min · 1 or 2 hands · 1/3 chest';
+  if (ageGroup === 'adult') {
+    cprTech = '<strong>Adult:</strong> 100–120/min · 2 hands · ≥5 cm depth · Full recoil';
+    cprTech += '<ul style="margin:6px 0 0 16px;padding:0;list-style:disc;font-size:12px;line-height:1.6;color:var(--text2);">';
+    cprTech += '<li>No SGA (OPA/BVM): 30:2 — pause for ventilations</li>';
+    cprTech += '<li>SGA or ETT in situ: 15:1 — no pause for ventilations</li>';
+    cprTech += '</ul>';
+  } else if (ageGroup === 'newborn') {
+    cprTech = '<strong>Newborn (birth–24h):</strong> 90/min · 2-finger or 2-thumb · 1/3 chest depth';
+    cprTech += '<ul style="margin:6px 0 0 16px;padding:0;list-style:disc;font-size:12px;line-height:1.6;color:var(--text2);">';
+    cprTech += '<li>No SGA: 3:1 ratio</li>';
+    cprTech += '</ul>';
+  } else if (ageGroup === 'small_infant' || ageGroup === 'large_infant') {
+    cprTech = '<strong>Infant (1 day–1 yr):</strong> 100–120/min · 2-thumb encircling or 2-finger · 1/3 chest';
+    cprTech += '<ul style="margin:6px 0 0 16px;padding:0;list-style:disc;font-size:12px;line-height:1.6;color:var(--text2);">';
+    cprTech += '<li>No SGA (OPA/BVM): 30:2 — pause for ventilations</li>';
+    cprTech += '<li>SGA or ETT in situ: 15:1 — no pause for ventilations</li>';
+    cprTech += '</ul>';
+  } else {
+    cprTech = '<strong>Child (1–11 yrs):</strong> 100–120/min · 1 or 2 hands · 1/3 chest';
+    cprTech += '<ul style="margin:6px 0 0 16px;padding:0;list-style:disc;font-size:12px;line-height:1.6;color:var(--text2);">';
+    cprTech += '<li>No SGA (OPA/BVM): 30:2 — pause for ventilations</li>';
+    cprTech += '<li>SGA or ETT in situ: 15:1 — no pause for ventilations</li>';
+    cprTech += '</ul>';
+  }
 
   var groupLabels = {
     newborn: 'Newborn (0–24h)',
@@ -5111,21 +5290,22 @@ function paedCalcUpdateFull(weightKg, ageLabel, ageGroup, ageMonths) {
 
   var html = '<div class="paed-result">';
   
-  if (isAdult) {
-    // Adult: informative message instead of weight/VSS
-    html += '<div style="background:rgba(74,144,217,0.08);border:1px solid rgba(74,144,217,0.25);border-radius:10px;padding:16px;margin-bottom:16px;text-align:center;">';
-    html += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">👤 ' + ageLabel + '</div>';
-    html += '<div style="font-size:13px;color:var(--text2);line-height:1.6;">In the context of these CPPs, ≥12 years of age is considered adult.<br>If unsure about management or dosages, refer to clinician for advice.</div>';
-    html += '</div>';
-  } else {
-    // Paediatric: weight summary header
-    html += '<div class="paed-result-header">';
+  // Header — adapt to what's been entered
+  html += '<div class="paed-result-header">';
+  if (hasAge && hasWeight) {
+    html += '<div class="paed-result-age">' + ageLabel + ' · ' + weightKg.toFixed(1) + ' kg (known)</div>';
+    html += '<div class="paed-result-group">' + (groupLabels[ageGroup] || ageGroup) + '</div>';
+  } else if (hasAge) {
     html += '<div class="paed-result-age">' + ageLabel + '</div>';
     html += '<div class="paed-result-weight">Est. weight: <span>' + weightKg.toFixed(1) + ' kg</span></div>';
     html += '<div class="paed-result-group">' + (groupLabels[ageGroup] || ageGroup) + '</div>';
-    html += '</div>';
+  } else {
+    html += '<div class="paed-result-age">Known weight: ' + weightKg.toFixed(1) + ' kg</div>';
+  }
+  html += '</div>';
 
-    // Vital signs - paediatric only
+  // Vital signs — only show if age is available
+  if (hasAge) {
     html += '<div class="paed-section-title">📊 Acceptable Vital Signs (Table 5)</div>';
     html += '<div class="paed-vss-grid">';
     html += '<div class="paed-vss-card"><div class="paed-vss-label">Systolic BP</div><div class="paed-vss-val">' + vss[2] + '</div><div class="paed-vss-unit">mmHg</div></div>';
@@ -5133,15 +5313,20 @@ function paedCalcUpdateFull(weightKg, ageLabel, ageGroup, ageMonths) {
     html += '<div class="paed-vss-card"><div class="paed-vss-label">Resp Rate</div><div class="paed-vss-val">' + vss[4] + '</div><div class="paed-vss-unit">breaths/min</div></div>';
     html += '</div>';
     html += '<div class="paed-vss-note">Reference row: ' + vss[0] + ' (' + vss[1] + ' kg)</div>';
+  } else {
+    html += '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:12px;text-align:center;">';
+    html += '<div style="font-size:12px;color:var(--text3);line-height:1.5;">📊 Enter age for vital sign ranges</div>';
+    html += '</div>';
   }
 
   // Defibrillation
+  var estNote = (weightSource === 'estimated') ? ' <span style="font-size:10px;color:var(--text3);font-weight:400;">(est.)</span>' : '';
   html += '<div class="paed-section-title">⚡ Defibrillation (CPP005)</div>';
   if (currentScope === 'PTO') {
     html += '<div class="paed-drug-row"><div class="paed-drug-name">AED</div><div class="paed-drug-dose">Use paediatric pads / settings if available</div></div>';
     html += '<div class="paed-drug-row paed-note-row"><div class="paed-drug-name">⚠️ Note</div><div class="paed-drug-dose">If paediatric pads/settings not available, use adult AED pads/settings until help arrives. Manual defibrillation not authorised for PTO.</div></div>';
   } else {
-    html += '<div class="paed-drug-row"><div class="paed-drug-name">Manual defib settings</div><div class="paed-drug-dose accent">' + defibDisplay + '</div></div>';
+    html += '<div class="paed-drug-row"><div class="paed-drug-name">Manual defib settings</div><div class="paed-drug-dose accent">' + defibDisplay + estNote + '</div></div>';
     if (ageGroup === 'newborn' || ageGroup === 'small_infant') {
       html += '<div class="paed-drug-row paed-note-row"><div class="paed-drug-name">⚠️ Note</div><div class="paed-drug-dose">Use paediatric pads/settings if available. AED acceptable if no manual.</div></div>';
     }
@@ -5166,21 +5351,25 @@ function paedCalcUpdateFull(weightKg, ageLabel, ageGroup, ageMonths) {
     html += '<div class="paed-section-title">💊 Medication Doses</div>';
     html += '<div class="paed-cpr-box" style="color:var(--text3);">No medications authorised for this scope.</div>';
   } else {
-  html += '<div class="paed-section-title">💊 Medication Doses (' + currentScope + ')</div>';
+  var doseSource = '';
+  if (hasWeight && hasAge) doseSource = ' <span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;">— from known weight</span>';
+  else if (hasWeight) doseSource = ' <span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;">— from known weight</span>';
+  else doseSource = ' <span style="font-size:10px;color:var(--orange);font-weight:400;text-transform:none;letter-spacing:0;">— estimated from age</span>';
+  html += '<div class="paed-section-title">💊 Medication Doses (' + currentScope + ')' + doseSource + '</div>';
   html += '<div class="paed-drug-table">';
   html += '<div class="paed-drug-header"><span>Drug</span><span>Dose</span><span>Notes</span></div>';
   if (allowedMeds.indexOf('paracetamol') !== -1) {
   if (isAdult) {
     html += '<div class="paed-drug-row"><div class="paed-drug-name">Paracetamol oral</div><div class="paed-drug-dose">500 mg – 1 g</div><div class="paed-drug-max">Max 4 g / 24h · repeat 4–6 hrly</div></div>';
   } else {
-    html += '<div class="paed-drug-row"><div class="paed-drug-name">Paracetamol oral (>1 month)</div><div class="paed-drug-dose">' + paracetamol_mg + ' mg (15 mg/kg)</div><div class="paed-drug-max">Max 1 g/dose · 4 g/day</div></div>';
+    html += '<div class="paed-drug-row"><div class="paed-drug-name">Paracetamol oral (>1 month)</div><div class="paed-drug-dose">' + paracetamol_max + ' mg' + (paracetamol_capped ? capLabel : ' (15 mg/kg)') + '</div><div class="paed-drug-max">Max 1 g/dose · 4 g/day</div></div>';
   }
   }
   if (allowedMeds.indexOf('adr_im') !== -1) {
   if (isAdult) {
     html += '<div class="paed-drug-row"><div class="paed-drug-name">Adrenaline IM 1:1000 (anaphylaxis / critical asthma)</div><div class="paed-drug-dose">500 mcg (0.5 mg) · 0.5 mL</div><div class="paed-drug-max">Repeat 5-min PRN · anaphylaxis: no max while RASH+ · asthma: max 1.5 mg (3 doses)</div></div>';
   } else {
-    html += '<div class="paed-drug-row"><div class="paed-drug-name">Adrenaline IM 1:1000 (anaphylaxis / asthma)</div><div class="paed-drug-dose">' + adr_im_mcg + ' mcg (0.01 mg/kg) · ' + adr_im_ml + ' mL</div><div class="paed-drug-max">Max 500 mcg · ' + adr_asthma_note + '</div></div>';
+    html += '<div class="paed-drug-row"><div class="paed-drug-name">Adrenaline IM 1:1000 (anaphylaxis / asthma)</div><div class="paed-drug-dose">' + adr_im_mcg + ' mcg' + (adr_im_capped ? capLabel : ' (0.01 mg/kg)') + ' · ' + adr_im_ml + ' mL</div><div class="paed-drug-max">Max 500 mcg · ' + adr_asthma_note + '</div></div>';
   }
   }
   if (allowedMeds.indexOf('adr_iv') !== -1) {
@@ -5188,7 +5377,7 @@ function paedCalcUpdateFull(weightKg, ageLabel, ageGroup, ageMonths) {
     html += '<div class="paed-drug-row"><div class="paed-drug-name">Adrenaline IV (cardiac arrest)</div><div class="paed-drug-dose">1 mg (1:10,000 or 1:1000 diluted)</div><div class="paed-drug-max">Repeat every 4 min (RNCC only)</div></div>';
     html += '<div class="paed-drug-row"><div class="paed-drug-name">Adrenaline IV (peri-arrest / anaphylaxis)</div><div class="paed-drug-dose">0.02 mg IV (1:1000)</div><div class="paed-drug-max">Titrate · RNCC only</div></div>';
   } else {
-    html += '<div class="paed-drug-row"><div class="paed-drug-name">Adrenaline IV (arrest)</div><div class="paed-drug-dose">' + adr_iv_mg + ' mg (0.01 mg/kg)</div><div class="paed-drug-max">Per cycle</div></div>';
+    html += '<div class="paed-drug-row"><div class="paed-drug-name">Adrenaline IV (arrest)</div><div class="paed-drug-dose">' + adr_iv_mg + ' mg' + (adr_iv_capped ? capLabel : ' (0.01 mg/kg)') + '</div><div class="paed-drug-max">Per cycle</div></div>';
   }
   }
   // Adrenaline nebulised for stridor (adult only — paed doesn't appear in paed calc)
@@ -6781,7 +6970,7 @@ SOURCE_CPP_HTML["CPP032"] = "<h2 class=\"fp-h2\">Traumatic head injury</h2>\n<p 
 SOURCE_CPP_HTML["CPP033"] = "<h2 class=\"fp-h2\">Potential spinal injury</h2>\n<p class=\"fp-p\">Spinal cord injury (SCI) is a serious condition which often results in severe morbidity and permanent disability. SCI occurs when the axons of nerves running through the spinal cord are disrupted by a traumatic event. This disruption leads to a loss of motor and sensory tone below the level of injury, which is the defining feature of an SCI and may have profound effects on other aspects of the patient\'s physiological parameters, including blood pressure.</p>\n<p class=\"fp-p\"><strong>NEPT services may be utilised to transport patients with an established SCI for ongoing management.</strong></p>\n<p class=\"fp-p\"><strong>NEPT services may encounter patients with acute SCI following a traumatic injury (penetrating or blunt). If SCI is suspected, the patient should be considered time critical and care must be escalated.</strong></p>\n<p class=\"fp-p\">It is important to highlight that not every traumatic injury involving the spinal region is considered an SCI. The majority of injuries to the spinal region do not involve a loss of motor and sensory tone or, if present, are transient in nature and not associated with permanent disability. For patients without confirmed or suspected SCI but who may have an injury (including vertebral fracture) that may lead to an SCI, the objective is to restrict spinal motion of the patient and apply support including a soft cervical collar.</p>\n<p class=\"fp-p\">The use of a screening checklist to determine whether to undertake spinal precautions in the adult population is approved for medium-high acuity NEPT. Where there is doubt about the presence of a spinal injury or in the case of paediatric patients presenting with a relevant mechanism of injury, NEPT crew members should apply a soft cervical collar and spinal motion restriction (SMR) techniques.</p>\n<p class=\"fp-p\"><strong>NEPT may be utilised to transport patients with an acute injury/mechanism where SMR is applied but where there is no strong suspicion of associated SCI</strong></p>\n<p class=\"fp-p\">Where a soft collar is indicated, a rigid cervical collar may be used in place of a soft cervical collar until supply of rigid collars is exhausted by NEPT providers.</p>\n<p class=\"fp-p\">Prophylactic administration of an anti-emetic (ondansetron) should occur in the case of patients who are managed with spinal motion restriction.</p>\n<p class=\"fp-p\">Example mechanisms of injury which may indicate spinal injury include:</p>\n<ul class=\"fp-ul\">\n<li>motor vehicle collision</li>\n<li>falls (standing height or greater)</li>\n<li>object falling on patient head</li>\n<li>blast injuries</li>\n<li>sports injuries.</li>\n</ul>\n<p class=\"fp-p\">Figure 30. Management of suspected SCI</p>";
 
 const NEPT_EMBEDDED_DATA = JSON.parse(
-  "{\"metadata\":{\"title\":\"NEPT CPP Master Training Data\",\"app_version\":\"Beta V035\",\"version\":\"2024\",\"source\":\"Non-Emergency Patient Transport Clinical Practice Protocols 2024 (Victoria)\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"scope_descriptions\":{\"PTO\":\"Patient Transport Officer\",\"EN\":\"Enrolled Nurse\",\"ATA\":\"Ambulance Transport Attendant\",\"RN\":\"Registered Nurse\",\"RNCC\":\"Registered Nurse Critical Care\"},\"total_cpps\":37,\"total_medications\":14,\"generated\":\"2026-02-21\"},\"scope_of_practice_table\":[{\"category\":\"Cardiac Arrest\",\"skill\":\"Defibrillation - AED\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Defibrillation - Manual\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"TE\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Oropharyngeal airway (OPA)\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Nasopharyngeal airway (NPA)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Supra-Glottic Airway (SGA)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Bag Valve Mask (BVM) Ventilation\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"IV cannulation\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Adrenaline IV (cardiac arrest)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Amiodarone IV (cardiac arrest)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Narrow Complex Tachycardia\",\"skill\":\"Assist Valsalva manoeuvre\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Wide Complex Tachycardia\",\"skill\":\"Amiodarone IV infusion (maintenance)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"TE\"},{\"category\":\"Bradycardia\",\"skill\":\"Atropine IV\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"TE\"},{\"category\":\"Undifferentiated Shock\",\"skill\":\"IV fluid (Normal Saline) initiation\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Undifferentiated Shock\",\"skill\":\"Metaraminol IV\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"TE\"},{\"category\":\"Cardiogenic Shock\",\"skill\":\"Supportive care / positioning\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Cardiogenic Shock\",\"skill\":\"Adrenaline infusion (maintenance)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"TE\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Adrenaline auto-injector IM\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Adrenaline 1:1000 from ampoule IM\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"TE\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Normal Saline IV bolus\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Glucagon IM (refractory anaphylaxis)\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"TE\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Adrenaline nebulised (stridor)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Salbutamol pMDI (bronchospasm)\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Salbutamol nebulised (bronchospa"
+  "{\"metadata\":{\"title\":\"NEPT CPP Master Training Data\",\"app_version\":\"Beta V036\",\"version\":\"2024\",\"source\":\"Non-Emergency Patient Transport Clinical Practice Protocols 2024 (Victoria)\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"scope_descriptions\":{\"PTO\":\"Patient Transport Officer\",\"EN\":\"Enrolled Nurse\",\"ATA\":\"Ambulance Transport Attendant\",\"RN\":\"Registered Nurse\",\"RNCC\":\"Registered Nurse Critical Care\"},\"total_cpps\":37,\"total_medications\":14,\"generated\":\"2026-02-21\"},\"scope_of_practice_table\":[{\"category\":\"Cardiac Arrest\",\"skill\":\"Defibrillation - AED\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Defibrillation - Manual\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"TE\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Oropharyngeal airway (OPA)\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Nasopharyngeal airway (NPA)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Supra-Glottic Airway (SGA)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Bag Valve Mask (BVM) Ventilation\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"IV cannulation\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Adrenaline IV (cardiac arrest)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Cardiac Arrest\",\"skill\":\"Amiodarone IV (cardiac arrest)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Narrow Complex Tachycardia\",\"skill\":\"Assist Valsalva manoeuvre\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Wide Complex Tachycardia\",\"skill\":\"Amiodarone IV infusion (maintenance)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"TE\"},{\"category\":\"Bradycardia\",\"skill\":\"Atropine IV\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"TE\"},{\"category\":\"Undifferentiated Shock\",\"skill\":\"IV fluid (Normal Saline) initiation\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Undifferentiated Shock\",\"skill\":\"Metaraminol IV\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"TE\"},{\"category\":\"Cardiogenic Shock\",\"skill\":\"Supportive care / positioning\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Cardiogenic Shock\",\"skill\":\"Adrenaline infusion (maintenance)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"TE\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Adrenaline auto-injector IM\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Adrenaline 1:1000 from ampoule IM\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"TE\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Normal Saline IV bolus\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Glucagon IM (refractory anaphylaxis)\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"TE\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Adrenaline nebulised (stridor)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Salbutamol pMDI (bronchospasm)\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Salbutamol nebulised (bronchospa"
 + "sm)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Ipratropium pMDI\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Ipratropium nebulised\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Anaphylaxis\",\"skill\":\"Adrenaline IV bolus\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Breathing / Hypoxia\",\"skill\":\"O2 saturation monitoring (SpO2)\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Breathing / Hypoxia\",\"skill\":\"Oxygen (nasal prongs / face mask)\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Breathing / Hypoxia\",\"skill\":\"Titrated oxygen (SpO2-guided)\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Breathing / Hypoxia\",\"skill\":\"BVM ventilation\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Asthma\",\"skill\":\"Salbutamol pMDI\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Asthma\",\"skill\":\"Salbutamol nebulised\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Asthma\",\"skill\":\"Ipratropium pMDI\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Asthma\",\"skill\":\"Ipratropium nebulised\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Asthma\",\"skill\":\"Adrenaline 1:1000 IM (ampoule)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"TE\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Asthma\",\"skill\":\"Adrenaline auto-injector (when ampoule unavailable)\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"COPD\",\"skill\":\"Salbutamol pMDI\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"COPD\",\"skill\":\"Salbutamol nebulised\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"COPD\",\"skill\":\"Ipratropium pMDI\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"COPD\",\"skill\":\"Ipratropium nebulised\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"ACPO\",\"skill\":\"GTN sublingual\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"ACPO\",\"skill\":\"Oxygen therapy\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"FBAO\",\"skill\":\"Back blows / chest thrusts\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"FBAO\",\"skill\":\"Laryngoscopy / Magills forceps\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"TE\"},{\"category\":\"ACS\",\"skill\":\"3 or 5-lead ECG monitoring\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"ACS\",\"skill\":\"12-lead ECG acquisition (not diagnostic)\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"ACS\",\"skill\":\"Aspirin 300mg oral\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"ACS\",\"skill\":\"GTN sublingual\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Hypoglycaemia\",\"skill\":\"Glucose paste oral\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Hypoglycaemia\",\"skill\":\"BGL monitoring\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Hypoglycaemia\",\"skill\":\"Gluca"
 + "gon IM\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Hypoglycaemia\",\"skill\":\"Dextrose 10% IV\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Nausea and Vomiting\",\"skill\":\"Ondansetron oral / wafer\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Nausea and Vomiting\",\"skill\":\"Ondansetron IV/IM\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Fracture Management\",\"skill\":\"Anatomical splinting\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Fracture Management\",\"skill\":\"Traction splints\",\"PTO\":\"TE\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Fracture Management\",\"skill\":\"Pelvic splinting\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Pain Management\",\"skill\":\"Ice / warm pack\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Pain Management\",\"skill\":\"Formable splint\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Pain Management\",\"skill\":\"Anatomical splint\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Pain Management\",\"skill\":\"Paracetamol oral\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Pain Management\",\"skill\":\"Methoxyflurane inhaled\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Pain Management\",\"skill\":\"Entonox inhaled (self-administered)\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Spinal Injuries\",\"skill\":\"C-collar / cervical collar\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Spinal Injuries\",\"skill\":\"Prophylactic ondansetron (oral, with SMR)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Major Trauma\",\"skill\":\"Arterial tourniquets\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Major Trauma\",\"skill\":\"Pressure dressings\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"Narcotic infusion SC (maintenance)\",\"PTO\":\"TE\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"IV Crystalloid (maintenance)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"GTN infusion (maintenance)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"Heparin infusion (maintenance)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"Blood products (maintenance)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"IV Crystalloid with potassium (maintenance)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"Antibiotic infusion (maintenance)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"TPN via PICC (maintenance)\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"Narcotic infusion IV (maintenance)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":"
 + "\"Vasoactive medications (inotropes) infusion\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"Anti-arrhythmic medication infusion\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"CVC infusion (including TPN)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Infusion Maintenance\",\"skill\":\"Insulin infusion (maintenance)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Other Procedures\",\"skill\":\"Capped CVC (low acuity)\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Other Procedures\",\"skill\":\"PICC not in active use\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Other Procedures\",\"skill\":\"Bladder washout\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"TE\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Other Procedures\",\"skill\":\"Chemotherapy infusion maintenance\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"TE\",\"RN\":\"TE\",\"RNCC\":\"TE\"},{\"category\":\"Other Procedures\",\"skill\":\"ICC management\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Other Procedures\",\"skill\":\"IV cannula insertion\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Other Procedures\",\"skill\":\"Arterial line monitoring (not insertion)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Other Procedures\",\"skill\":\"Intra-aortic balloon pump management\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Other Procedures\",\"skill\":\"Pacing wire management (not insertion)\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"},{\"category\":\"Transport Acuity\",\"skill\":\"Low acuity IFT\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Transport Acuity\",\"skill\":\"Low acuity unplanned ambulance\",\"PTO\":\"YES\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Transport Acuity\",\"skill\":\"Medium acuity IFT\",\"PTO\":\"NO\",\"EN\":\"YES\",\"ATA\":\"YES\",\"RN\":\"YES\",\"RNCC\":\"YES\"},{\"category\":\"Transport Acuity\",\"skill\":\"Medium acuity unplanned ambulance\",\"PTO\":\"NO\",\"EN\":\"TE\",\"ATA\":\"YES\",\"RN\":\"TE\",\"RNCC\":\"YES\"},{\"category\":\"Transport Acuity\",\"skill\":\"High acuity IFT\",\"PTO\":\"NO\",\"EN\":\"NO\",\"ATA\":\"NO\",\"RN\":\"NO\",\"RNCC\":\"YES\"}],\"protocols\":[{\"id\":\"ASSESS_PSA\",\"title\":\"NEPT Perfusion Status Assessment (PSA) – Adult\",\"category\":\"Assessment Tools\",\"scope_applicable\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"background\":\"Perfusion relates to the cardiovascular system's ability to deliver oxygenated blood to tissues. Perfusion must be viewed as a collection of vital signs, not an isolated measurement, contextualised against patient's condition and PMH.\",\"recognition\":[],\"assessment_table\":{\"type\":\"psa\",\"description\":\"PSA grades perfusion status across 5 parameters\",\"parameters\":[\"Skin\",\"Pulse (BPM)\",\"BP (Systolic)\",\"Conscious State\",\"Capillary Refill\"],\"grades\":[{\"grade\":\"Adequate\",\"skin\":\"Warm, pink, dry\",\"pulse\":\"60–100\",\"bp\":\">100\",\"conscious_state\":\"Alert\",\"cap_refill\":\"Central <2s / Distal <2s\"},{\"grade\":\"Borderline\",\"skin\":\"Warm, pink, dry/cool, pale, clammy\",\"pulse\":\"50–100\",\"bp\":\"80–100\",\"conscious_state\":\"Alert\",\"cap_refill\":\"Central <2s / Distal >2s\"},{\"grade\":\"Inadequate\",\"skin\":\"Cool, pale, clammy\",\"pulse\":\"<50 or >100\",\"bp\":\"60–80\",\"conscious_state\":\"Alert or altered\",\"cap_refill\":\"Central <2s or >2s / Distal >2s\"},{\"grade\":\"Extremel"
@@ -6816,7 +7005,7 @@ const NEPT_EMBEDDED_DATA = JSON.parse(
 + "l paracetamol?\",\"What is the paediatric dose of paracetamol syrup?\",\"What is required for Entonox administration?\"],\"action_cards\":[{\"title\":\"📋 Assess Pain\",\"priority\":1,\"body\":\"Use the most appropriate pain assessment tool.\",\"params\":[\"OPQRST / DOLOR\",\"Numeric Rating Scale (0–10)\",\"Verbal Rating Scale\",\"Wong-Baker FACES\"],\"footer\":\"Inability to report pain (dementia, intellectual disability, NESB) should not preclude analgesia\"},{\"title\":\"🩹 Non-Pharmacological — First\",\"priority\":1,\"body\":\"Consider before pharmacological management.\",\"params\":[\"Reassurance\",\"Optimal positioning / posture\",\"Splinting\",\"Cooling burns\",\"Occlusive dressings\",\"Ice / warm packs\",\"Temperature management\"]},{\"title\":\"♻ Chronic Pain\",\"priority\":1,\"body\":\"Exclude new aetiology. Ensure existing pain management plan is followed. Partial relief may be a realistic goal.\"},{\"title\":\"💊 Paracetamol\",\"priority\":2,\"body\":\"Adult: 500 mg–1 g oral. Paediatric: 15 mg/kg oral syrup (max 1 g).\",\"params\":[\"Repeat 4–6 hourly\",\"Max 4 g / 24 hr (adult) or 60 mg/kg / 24 hr (paediatric)\",\"⬤ NOT appropriate for suspected ACS\"]},{\"title\":\"💨 Methoxyflurane (Penthrox)\",\"priority\":2,\"body\":\"3 mL inhaled (self-administered). One further 3 mL dose if needed.\",\"params\":[\"⬤ Maximum 6 mL per 24 hours — HARD LIMIT\",\"Onset: after 8–10 breaths\",\"Duration: ~3–5 min after cessation\"],\"scope_params\":{\"EN\":[],\"ATA\":[],\"RN\":[],\"RNCC\":[]}},{\"title\":\"💨 Entonox\",\"priority\":2,\"body\":\"50% nitrous oxide / 50% oxygen — titrate to pain.\",\"params\":[\"⬤ Must be self-administered by patient\",\"Contraindicated: pneumothorax, head injury, compromised consciousness\"],\"scope_params\":{\"EN\":[],\"ATA\":[],\"RN\":[],\"RNCC\":[]}},{\"title\":\"🚑 IFT Considerations\",\"priority\":3,\"body\":\"Ensure adequate analgesia given before transport or request from sending facility.\"},{\"title\":\"⚠ Dose Reduction\",\"priority\":3,\"body\":\"Consider dose reduction or longer intervals for elderly, frail, or small patients.\"}],\"search_keywords\":[\"pain\",\"analgesia\",\"paracetamol\",\"Panadol\",\"methoxyflurane\",\"Penthrox\",\"Entonox\",\"pain relief\",\"OPQRST\",\"DOLOR\",\"Wong-Baker\",\"numeric rating\",\"Penthrox inhaler\",\"green whistle\",\"entonox\",\"nitrous oxide\",\"paracetamole\",\"paracetimol\",\"paracetemol\",\"methoxyfluorane\",\"methoxyflorane\",\"penthox\",\"analgesea\",\"anelgesia\"]},{\"id\":\"CPP014\",\"title\":\"CPP014: Acute Cardiogenic Pulmonary Oedema (ACPO)\",\"category\":\"Cardiac\",\"scope_applicable\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"background\":\"ACPO = accumulation of fluid in alveolar spaces due to cardiac failure. Presents with respiratory compromise, hypoxia, orthopnoea. Management targets reducing BP and improving hypoxia.\",\"recognition\":[{\"text\":\"Excessive shortness of breath on exertion or at rest\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Diaphoresis (excessive sweating)\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Blood-tinged or pink sputum (severe)\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Significant hypertension (especially with left ventricular dysfunction)\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Dependent oedema\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Crackles on chest auscultation\",\"scopes\":[\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Orthopnoea (worse breathing lying flat)\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]}],\"memory_items\":[\"Sit patient upright — reduces preload and work of breathing\",\"High-flow O2\",\"GTN sublingual — reduces preload and afterload (EN, ATA, RN, RNCC)\"],\"decision_tree\":[{\"id\":\"start\",\"text\":\"ACPO signs: severe SOB, orthopnoea,\\ndiaphoresis, crackles on auscultation,\\npink/frothy sputum, ↑BP, oedema\\nAssess: SpO₂, RR, HR, BP\",\"next\":[\"positio"
 + "n\"]},{\"id\":\"position\",\"text\":\"Sit patient upright (legs down if possible)\\nHigh-flow O₂ — NRB 10-15 L/min\\nTarget SpO₂ 94-98%\\nContinuous monitoring (ECG, SpO₂, NIBP)\",\"next\":[\"htn\"]},{\"id\":\"htn\",\"type\":\"decision\",\"text\":\"Significant hypertension?\\n(SBP >180 — severe LV dysfunction suspected)\",\"yes\":\"gtn\",\"no\":\"escalate\"},{\"id\":\"gtn\",\"text\":\"GTN 400 mcg sublingual\\n(if SBP >90 and not on phosphodiesterase inhibitors)\\nRepeat every 5 min (max 3 doses)\\nMonitor BP closely\\n→ CPP013 if cardiogenic shock develops\",\"next\":[\"escalate\"]},{\"id\":\"escalate\",\"text\":\"Escalate — CPP006\\nTransport, if authorised\\nNIV (CPAP) if in scope and plan exists\\n(not during air transport)\\nVSS every 5 min\\nPre-notify receiving ED\",\"next\":[]}],\"medications_used\":[\"GTN\"],\"quiz_triggers\":[\"What position should an ACPO patient be placed in and why?\",\"What SBP is the minimum threshold for GTN administration?\",\"What HR range contraindicates GTN?\",\"What does GTN do to reduce cardiac workload?\"],\"action_cards\":[{\"title\":\"🫁 Identify ACPO\",\"priority\":1,\"body\":\"Acute cardiogenic pulmonary oedema — fluid accumulation in alveolar spaces from cardiac failure.\",\"params\":[\"Severe SOB / orthopnoea (worsening breathlessness or feeling of drowning when supine)\",\"Diaphoresis\",\"Crackles on auscultation\",\"Pink / frothy sputum (severe)\",\"Chest pain — if associated with acute cardiac event\",\"Dependent oedema\",\"⬤ Significant hypertension — may indicate severe LV systolic dysfunction → consider CPP013\"]},{\"title\":\"🔴 Immediate Management\",\"priority\":1,\"params\":[\"⬤ Sit patient upright — legs down if possible (reduces preload)\",\"⬤ Manage hypoxia per CPP007 Oxygen therapy\",\"Target SpO₂ 94–98%\",\"Continuous monitoring (ECG, SpO₂, NIBP)\",\"Escalate per CPP006\"]},{\"title\":\"⚠️ If Patient Not Hypertensive\",\"priority\":2,\"body\":\"ACPO management targets reducing BP — if patient is not hypertensive, reconsider diagnosis.\",\"params\":[\"Consider differential diagnosis (non-cardiogenic pulmonary oedema, pneumonia, PE)\",\"Continue oxygen therapy PRN per CPP007\",\"Non-cardiogenic pulmonary oedema → manage hypoxia per CPP007 and supportive care\"]},{\"title\":\"💊 GTN — Reduce Preload\",\"priority\":2,\"body\":\"GTN reduces preload and afterload — key intervention for hypertensive ACPO. Titrate to respiratory improvement and BP reduction.\",\"params\":[\"⬤ Withhold GTN if SBP < 100 or otherwise contraindicated\",\"GTN 0.3 mg sublingual OR GTN 0.4 mg nitrolingual spray\",\"⬤ Repeat every 5 min — no maximum dose\",\"Titrate to respiratory improvement and BP reduction\",\"⬤ Check SBP and HR between doses. If patient becomes hypotensive, remove remaining tablet\",\"If SBP drops → manage as CPP013 Cardiogenic Shock\"],\"scopes\":[\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"title\":\"💨 NIV (CPAP / Bi-Level)\",\"priority\":3,\"body\":\"Not authorised for routine NEPT. May be considered by high acuity services with escort or endorsed crew member and clinical plan from sending facility.\",\"params\":[\"Patient must be stable on NIV prior to transfer\",\"⬤ NIV must NOT be used during air transport\"]},{\"title\":\"🏥 Common Associations\",\"priority\":3,\"body\":\"ACPO commonly presents during transport of patients with chronic cardiac conditions:\",\"params\":[\"Coronary artery disease with LV failure\",\"Congestive heart failure\",\"Cardiomyopathy\",\"Valvular heart diseases\",\"Cardiac dysrhythmias\",\"Right-to-left shunts\"]},{\"title\":\"🔗 Cross-References\",\"priority\":3,\"params\":[\"CPP006 Clinical escalation\",\"CPP007 Oxygen therapy — hypoxia management\",\"CPP013 Cardiogenic shock — if significant hypertension with LV failure or SBP drops\"]}],\"search_keywords\":[\"ACPO\",\"pulmonary oedema\",\"pulmonary edema\",\"heart failure\",\"CHF\",\"GTN\",\"CPAP\",\"BiPAP\",\"NIV\",\"fluid on lungs\",\"pulmomary oedema\",\"pulmonery oedema\",\"oedema\",\"edema\",\"odema\",\""
 + "glyceryl trinitrate\",\"glyceral trinitrate\",\"glyceryl trinitrite\"]},{\"id\":\"CPP018\",\"title\":\"CPP018: Asthma – Adult\",\"category\":\"Respiratory\",\"scope_applicable\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"background\":\"Asthma severity guides management. Patients who respond completely to mild-moderate treatment may continue transport. Severity classified as: Mild, Moderate, Severe, Critical.\",\"recognition\":[{\"text\":\"Increased shortness of breath\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Wheezing — auscultated or audible\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Tachycardia\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Sweating / diaphoresis\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Patient usually aware of exacerbation and own triggers\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]}],\"memory_items\":[\"Salbutamol pMDI + spacer — all scopes\",\"Nebulised salbutamol + ipratropium — ATA, RN, RNCC (EN = TE)\",\"Adrenaline IM for critical asthma — RNCC/RN (independent); ATA/EN (TE)\",\"Escalate all severe/critical — consider early adrenaline for thunderstorm asthma\"],\"severity_guide\":{\"mild\":{\"description\":\"Minimal wheeze, speaking normally\",\"scopes_can_manage\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"treatment\":\"Salbutamol pMDI 4–12 puffs via spacer. Repeat 20-min intervals until resolution.\"},\"moderate\":{\"description\":\"Wheeze, some difficulty speaking\",\"scopes_can_manage\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"treatment\":\"Salbutamol pMDI 4–12 puffs via spacer at 20-min intervals. If unsuccessful → manage as severe.\"},\"severe\":{\"description\":\"Significant wheeze, speaking in words, tachycardia\",\"scopes_can_manage\":[\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"treatment\":\"Salbutamol 10mg + Ipratropium 0.5mg nebulised via 8L O2 mask. Repeat salbutamol every 5 min. If unsuccessful → critical.\"},\"critical\":{\"description\":\"Silent chest, cyanosis, exhaustion, altered consciousness\",\"scopes_can_manage\":[\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"treatment\":\"Salbutamol + Ipratropium nebulised. Adrenaline 0.5mg (500mcg) 1:1000 IM. If 1:1000 unavailable/not endorsed: EpiPen/Anapen. Repeat adrenaline every 5 min (max 1.5mg / 3 doses).\"}},\"thunderstorm_asthma\":{\"description\":\"High-risk period: October–December Victoria. Early IMI adrenaline consideration even before critical.\",\"management\":\"Consider early IM adrenaline (ampoule or auto-injector). If delay to escalation: commence transport to ED.\",\"scopes\":{\"EN\":\"TE\",\"ATA\":\"TE\",\"RN\":\"YES\",\"RNCC\":\"YES\"}},\"decision_tree\":[{\"id\":\"start\",\"type\":\"header\",\"text\":\"Asthma Exacerbation — Adult\\nAssess severity using clinical features\"},{\"id\":\"escalate\",\"type\":\"header\",\"text\":\"⬆ ESCALATE CARE (CPP006) if ANY concern\\nAll moderate/severe/critical MUST escalate\"},{\"id\":\"h0\",\"type\":\"col_header\",\"col\":0,\"text\":\"MILD\"},{\"id\":\"h1\",\"type\":\"col_header\",\"col\":1,\"text\":\"MODERATE\"},{\"id\":\"h2\",\"type\":\"col_header\",\"col\":2,\"text\":\"SEVERE\"},{\"id\":\"h3\",\"type\":\"col_header\",\"col\":3,\"text\":\"CRITICAL / NEAR-FATAL\"},{\"id\":\"b0\",\"type\":\"col_body\",\"col\":0,\"text\":\"SpO₂ ≥95%\\nRR normal/mild ↑\\nSpeaking in sentences\\nMild wheeze\\nHR <100 bpm\\nNormal mental state\\nNo accessory muscles\\n\\nManagement:\\nSalbutamol pMDI+spacer\\n4 puffs q4 min\\n(total 8-12 puffs)\\nO₂ if SpO₂ <94%\"},{\"id\":\"b1\",\"type\":\"col_body\",\"col\":1,\"text\":\"SpO₂ 90-94%\\nRR >25/min\\nSpeaking in phrases\\nAudible wheeze\\nHR 100-120 bpm\\nMild agitation\\nMild accessory muscle use\\n\\nManagement:\\nSalbutamol pMDI+spacer\\n6 puffs q4 min OR\\nnebulised 5 mg\\nO₂ NRB if SpO₂ <94%\\nIPRATROPIUM neb 500mcg\\nEscalate — CPP006\"},{\"id\":\"b2\",\"type\":\"col_body\",\"col\":2,\"text\":\"SpO₂ <90%\\nRR >30/min\\nSpeaking in words only\\nLoud wheeze / silent chest dev"
-+ "eloping\\nHR >120 bpm\\nMarkedly distressed\\nSignificant accessory muscle use\\n\\nManagement:\\nSalbutamol continuous neb 5mg\\nIPRATROPIUM 500 mcg neb\\nO₂ high-flow NRB\\nConsider IM Adrenaline 0.5mg (1:1000)\\nEscalate — CPP006 URGENTLY\"},{\"id\":\"b3\",\"type\":\"col_body\",\"col\":3,\"text\":\"SpO₂ <85%\\nSilent chest / absent breath sounds\\nUnable to speak\\nCyanosis\\nBradycardia / ↓HR\\nAltered / ↓conscious state\\nExhaustion\\n\\nManagement:\\nAdrenaline IM 0.5mg (1:1000) IMMEDIATELY\\nSalbutamol continuous neb 5mg\\nIPRATROPIUM 500 mcg neb\\nO₂ high-flow NRB\\n→ CPP004 if cardiac arrest\\nEscalate CODE 1\"},{\"id\":\"f0\",\"type\":\"col_footer\",\"col\":0,\"text\":\"Monitor for deterioration\\nRepeat Salbutamol as needed\\nTransport — NEPT may continue if\\ncomplete resolution of symptoms\"},{\"id\":\"f1\",\"type\":\"col_footer\",\"col\":1,\"text\":\"Repeat Salbutamol every 20 min\\nMonitor response\\nTransport — NEPT only if improving\\nEscalation if no response\"},{\"id\":\"f2\",\"type\":\"col_footer\",\"col\":2,\"text\":\"Transport, if authorised\\nContinuous nebulisation en route\\nCode 1 if deteriorating\\nRepeat IM Adrenaline after 15 min\\nif no response\"},{\"id\":\"f3\",\"type\":\"col_footer\",\"col\":3,\"text\":\"CODE 1 transport\\nPrepare for CPR\\nRepeat Adrenaline IM if no response\\nPre-notify ED: critical asthma\"},{\"id\":\"ca\",\"type\":\"footer\",\"text\":\"Cardiac arrest → CPP004\\nThunderstorm asthma: consider EARLY IM Adrenaline\\nfor all severity levels if thunderstorm event declared\"}],\"medications_used\":[\"SALBUTAMOL\",\"IPRATROPIUM\",\"ADRENALINE\"],\"quiz_triggers\":[\"How many puffs of salbutamol pMDI are given for severe adult asthma?\",\"What is the dose of adrenaline IM for critical asthma?\",\"What is the maximum number of repeat adrenaline doses for critical asthma?\",\"What ventilation rate is used for the unconscious/apnoeic asthma patient?\",\"When is thunderstorm asthma season in Victoria?\"],\"action_cards\":[{\"title\":\"🫁 Assess Severity\",\"priority\":1,\"badge\":\"memory\",\"body\":\"Establish asthma presentation and determine severity based on respiratory status assessment.\",\"subs\":[{\"label\":\"MILD\",\"params\":[\"Speaking in sentences\",\"Mild wheeze\",\"SpO₂ ≥ 95%\"]},{\"label\":\"MODERATE\",\"params\":[\"Speaking in phrases\",\"Wheeze present\",\"SpO₂ 90–94%\"]},{\"label\":\"SEVERE\",\"params\":[\"Speaking in words only\",\"Significant wheeze\",\"Tachycardia\",\"Accessory muscle use\"]},{\"label\":\"CRITICAL\",\"params\":[\"Silent chest\",\"Cyanosis\",\"Exhaustion / altered consciousness\",\"Unable to speak\"]}]},{\"title\":\"⬆ Escalate — CPP006\",\"priority\":1,\"body\":\"Escalate care per CPP006 Clinical escalation.\",\"params\":[\"All moderate / severe / critical → escalate\",\"Medium–high acuity may consider delaying escalation if management is routine for mild exacerbations (limited to pMDI salbutamol)\",\"Where applicable, consult and follow patient's own asthma plan\"],\"scope_params\":{\"PTO\":[\"All moderate / severe / critical → escalate\",\"Where applicable, consult and follow patient's own asthma plan\"]}},{\"title\":\"💚 Mild / Moderate — pMDI\",\"priority\":2,\"body\":\"Salbutamol pMDI 4–12 puffs via spacer.\\nPatient takes 4 breaths between each puff.\\nRepeat at 20-minute intervals until resolution of symptoms.\",\"params\":[\"O₂ therapy per CPP007 if SpO₂ below target\",\"If complete resolution of symptoms → medium–high acuity may continue NEPT transport\"],\"scope_params\":{\"PTO\":[\"O₂ therapy per CPP007 if SpO₂ below target\"]},\"footer\":\"If unsuccessful → manage as severe\"},{\"title\":\"🟡 Severe — Nebulised Therapy\",\"priority\":2,\"body\":\"Salbutamol 10 mg + Ipratropium 0.5 mg nebulised via mask with 8 L O₂.\",\"params\":[\"Repeat salbutamol 10 mg every 5 min as required\",\"Escalate per CPP006\"],\"scope_params\":{\"EN\":[\"⬤ TE authorisation required for nebulised therapy\"],\"ATA\":[],\"RN\":[],\"RNCC\":[]},\"footer\":\"If unsucces"
++ "eloping\\nHR >120 bpm\\nMarkedly distressed\\nSignificant accessory muscle use\\n\\nManagement:\\nSalbutamol continuous neb 5mg\\nIPRATROPIUM 500 mcg neb\\nO₂ high-flow NRB\\nConsider IM Adrenaline 0.5mg (1:1000)\\nEscalate — CPP006 URGENTLY\"},{\"id\":\"b3\",\"type\":\"col_body\",\"col\":3,\"text\":\"SpO₂ <85%\\nSilent chest / absent breath sounds\\nUnable to speak\\nCyanosis\\nBradycardia / ↓HR\\nAltered / ↓conscious state\\nExhaustion\\n\\nManagement:\\nAdrenaline IM 0.5mg (1:1000) IMMEDIATELY\\nSalbutamol continuous neb 5mg\\nIPRATROPIUM 500 mcg neb\\nO₂ high-flow NRB\\n→ CPP004 if cardiac arrest\\nEscalate CODE 1\"},{\"id\":\"f0\",\"type\":\"col_footer\",\"col\":0,\"text\":\"Monitor for deterioration\\nRepeat Salbutamol as needed\\nTransport — NEPT may continue if\\ncomplete resolution of symptoms\"},{\"id\":\"f1\",\"type\":\"col_footer\",\"col\":1,\"text\":\"Repeat Salbutamol every 20 min\\nMonitor response\\nTransport — NEPT only if improving\\nEscalation if no response\"},{\"id\":\"f2\",\"type\":\"col_footer\",\"col\":2,\"text\":\"Transport, if authorised\\nContinuous nebulisation en route\\nCode 1 if deteriorating\\nRepeat IM Adrenaline after 15 min\\nif no response\"},{\"id\":\"f3\",\"type\":\"col_footer\",\"col\":3,\"text\":\"CODE 1 transport\\nPrepare for CPR\\nRepeat Adrenaline IM if no response\\nPre-notify ED: critical asthma\"},{\"id\":\"ca\",\"type\":\"footer\",\"text\":\"Cardiac arrest → CPP004\\nThunderstorm asthma: consider EARLY IM Adrenaline\\nfor all severity levels if thunderstorm event declared\"}],\"medications_used\":[\"SALBUTAMOL\",\"IPRATROPIUM\",\"ADRENALINE\"],\"quiz_triggers\":[\"How many puffs of salbutamol pMDI are given for severe adult asthma?\",\"What is the dose of adrenaline IM for critical asthma?\",\"What is the maximum number of repeat adrenaline doses for critical asthma?\",\"What ventilation rate is used for the unconscious/apnoeic asthma patient?\",\"When is thunderstorm asthma season in Victoria?\"],\"action_cards\":[{\"title\":\"🫁 Assess Severity\",\"priority\":1,\"badge\":\"memory\",\"body\":\"Establish asthma presentation and determine severity based on respiratory status assessment.\",\"subs\":[{\"label\":\"MILD\",\"params\":[\"Speaking in sentences\",\"Mild wheeze\",\"SpO₂ ≥ 95%\"]},{\"label\":\"MODERATE\",\"params\":[\"Speaking in phrases\",\"Wheeze present\",\"SpO₂ 90–94%\"]},{\"label\":\"SEVERE\",\"params\":[\"Speaking in words only\",\"Significant wheeze\",\"Tachycardia\",\"Accessory muscle use\"]},{\"label\":\"CRITICAL\",\"params\":[\"Silent chest\",\"Cyanosis\",\"Exhaustion / altered consciousness\",\"Unable to speak\"]}]},{\"title\":\"⬆ Escalate — CPP006\",\"priority\":1,\"body\":\"Escalate care per CPP006 Clinical escalation.\",\"params\":[\"All moderate / severe / critical → escalate\",\"Medium–high acuity may consider delaying escalation if management is routine for mild exacerbations (limited to pMDI salbutamol)\",\"Where applicable, consult and follow patient's own asthma plan\"],\"scope_params\":{\"PTO\":[\"All moderate / severe / critical → escalate\",\"Where applicable, consult and follow patient's own asthma plan\"],\"EN\":[],\"ATA\":[],\"RN\":[],\"RNCC\":[]}},{\"title\":\"💚 Mild / Moderate — pMDI\",\"priority\":2,\"body\":\"Salbutamol pMDI 4–12 puffs via spacer.\\nPatient takes 4 breaths between each puff.\\nRepeat at 20-minute intervals until resolution of symptoms.\",\"params\":[\"O₂ therapy per CPP007 if SpO₂ below target\",\"If complete resolution of symptoms → medium–high acuity may continue NEPT transport\"],\"scope_params\":{\"PTO\":[\"O₂ therapy per CPP007 if SpO₂ below target\"],\"EN\":[],\"ATA\":[],\"RN\":[],\"RNCC\":[]},\"footer\":\"If unsuccessful → manage as severe\"},{\"title\":\"🟡 Severe — Nebulised Therapy\",\"priority\":2,\"body\":\"Salbutamol 10 mg + Ipratropium 0.5 mg nebulised via mask with 8 L O₂.\",\"params\":[\"Repeat salbutamol 10 mg every 5 min as required\",\"Escalate per CPP006\"],\"scope_params\":{\"EN\":[\"⬤ TE authorisation required for nebulised therapy\"],\"ATA\":[],\"RN\":[],\"RNCC\":[]},\"footer\":\"If unsucces"
 + "sful → manage as critical\"},{\"title\":\"🟡 Severe — PTO\",\"priority\":2,\"body\":\"PTO scope: continue salbutamol pMDI + spacer for severe asthma.\\nEscalate per CPP006 — do not delay.\",\"params\":[\"Salbutamol pMDI 4–12 puffs via spacer\",\"Repeat at 20-minute intervals\",\"O₂ therapy per CPP007\"],\"scope_params\":{\"PTO\":[]}},{\"title\":\"🔴 Critical — Adrenaline\",\"priority\":2,\"body\":\"Continue nebulised salbutamol + ipratropium as per severe.\\nAdrenaline 0.5 mg (500 mcg) IMI 1:1000.\\nRepeat at 5-minute intervals PRN — max 1.5 mg (3 doses).\",\"params\":[\"⬤ Immediate escalation per CPP006\"],\"scope_params\":{\"EN\":[\"⬤ TE authorisation required\"],\"ATA\":[\"⬤ TE authorisation required for adrenaline ampoule\"],\"RN\":[],\"RNCC\":[]},\"footer\":\"If 1:1000 ampoule not available or not endorsed → adrenaline auto-injector (EpiPen®/Anapen®), repeat to max 3 doses\"},{\"title\":\"🔴 Critical — Auto-Injector\",\"priority\":2,\"body\":\"Adrenaline auto-injector (EpiPen® or Anapen®).\\nRepeat to maximum of 3 doses at 5-minute intervals.\",\"params\":[\"O₂ therapy per CPP007\",\"Continue salbutamol pMDI + spacer\",\"⬤ Immediate escalation per CPP006\"],\"scope_params\":{\"PTO\":[]}},{\"title\":\"🫁 Unconscious / Apnoeic / Arrest\",\"priority\":3,\"body\":\"If patient becomes unconscious or apnoeic due to asthma:\",\"params\":[\"Ventilate at tidal volume (6–7 ml/kg) at reduced rate of 5–8 per minute\",\"Allow prolonged expiratory phase when releasing BVM pressure\",\"⬤ If cardiac arrest from confirmed asthma deterioration → allow 1 minute of apnoea then commence CPP004 Cardiac arrest\",\"⬤ If any doubt exists → commence immediate resuscitation per CPP004\"]},{\"title\":\"⛈ Thunderstorm Asthma\",\"priority\":3,\"body\":\"Thunderstorm asthma poses a significant risk in Victoria during defined periods, usually October to December (or early January).\",\"params\":[\"NEPT providers may be activated under SHEMP response\",\"Consider early IMI adrenaline delivery — from 1:1000 ampoule or auto-injector device\",\"⬤ If delay to normal escalation (including emergency ambulance services) → commence transport to nearest ED instead of remaining on scene\",\"Non-asthma bronchospasm (e.g. smoke inhalation) → manage as per this protocol except NO IM adrenaline\"],\"footer\":\"<a href=\\\"https://www.health.vic.gov.au/environmental-health/epidemic-thunderstorm-asthma-risk-forecast\\\" target=\\\"_blank\\\" style=\\\"color:var(--accent);text-decoration:underline;\\\">DH Thunderstorm Asthma Risk Forecast & Alerts</a>\"}],\"priority_labels\":{\"1\":\"CRITICAL\",\"2\":\"MANAGEMENT\",\"3\":\"SPECIAL CIRCUMSTANCES\"},\"search_keywords\":[\"asthma\",\"bronchospasm\",\"wheeze\",\"salbutamol\",\"Ventolin\",\"ipratropium\",\"Atrovent\",\"nebuliser\",\"spacer\",\"pMDI\",\"thunderstorm asthma\",\"inhaler\",\"salbutamole\",\"salbutimol\",\"ipratropeum\",\"ipatropium\",\"bronchospasam\",\"broncho spasm\"]},{\"id\":\"CPP023\",\"title\":\"CPP023: Acute Coronary Syndrome (ACS) – Cardiac Chest Pain\",\"category\":\"Cardiac\",\"scope_applicable\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"background\":\"ACS includes STEMI, NSTEMI, and unstable angina. Goal is reducing platelet aggregation (aspirin), reducing myocardial workload (GTN), rapid escalation, and pain relief. Complete pain removal unlikely — target mild pain level.\",\"recognition\":[{\"text\":\"Acute central chest pain / discomfort or epigastric pain without other definitive diagnosis\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"text\":\"Men commonly present with crushing chest pain radiating to the left arm, while women may experience less typical symptoms such as jaw, back, neck, or groin pain, fatigue, or nausea — potentially leading to delayed recognition and treatment.\",\"scopes\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"]}],\"memory_items\":[\"Aspirin 300mg oral FIRST (if no contraindications)\",\"GTN 0.3mg SL — if SBP ≥100 (EN, ATA, RN, RNCC)\",\"DO NOT use paracetamol for ACS "
 + "pain\",\"NEPT MUST NOT transport patient with cardiac chest pain within 2 hours of presentation\",\"Rapid escalation per CPP006\"],\"decision_tree\":[{\"id\":\"start\",\"text\":\"Suspected ACS: acute chest/epigastric pain\\nwithout other definitive diagnosis\\nAdditional symptoms: nausea, diaphoresis,\\nECG changes, jaw/back radiation, dyspnoea\\n⚠ Do NOT transport if chest pain <2hrs ago\",\"next\":[\"assess\"]},{\"id\":\"assess\",\"text\":\"Immediate assessment:\\n• 12-lead ECG (if equipment available)\\n• VSS: BP, HR, SpO₂, RR\\n• Pain scale (OPQRST)\\n• Position of comfort (usually semi-recumbent)\\n• Oxygen: ONLY if SpO₂ <94% (not routine)\",\"next\":[\"aspirin\"]},{\"id\":\"aspirin\",\"type\":\"decision\",\"text\":\"No aspirin contraindications?\\n(no allergy, no active bleeding, not taken in last 24h)\",\"yes\":\"give_asp\",\"no\":\"skip_asp\"},{\"id\":\"give_asp\",\"text\":\"Aspirin 300 mg oral (chewed)\\n(reduces platelet aggregation)\\nDocument time of administration\",\"next\":[\"gtn\"]},{\"id\":\"skip_asp\",\"text\":\"Document reason for not giving aspirin\\nContinue management\",\"next\":[\"gtn\"]},{\"id\":\"gtn\",\"type\":\"decision\",\"text\":\"SBP >90 mmHg?\\n(GTN contraindicated in hypotension\\nor PDE5 inhibitors in last 24h)\",\"yes\":\"give_gtn\",\"no\":\"skip_gtn\"},{\"id\":\"give_gtn\",\"text\":\"GTN 400 mcg sublingual\\nRepeat every 5 min x2 if SBP >90\\nMonitor BP closely — can drop suddenly\",\"next\":[\"analgesia\"]},{\"id\":\"skip_gtn\",\"text\":\"Do NOT give GTN\\nSBP too low or PDE5 inhibitor use\\nManage pain with alternatives\",\"next\":[\"analgesia\"]},{\"id\":\"analgesia\",\"text\":\"Pain management — CPP029:\\nMethoxyflurane 3 ml inhaled OR\\nEntonox titrated to pain\\n(Paracetamol NOT appropriate for ACS)\\nGoal: pain mild (<4/10)\",\"next\":[\"transport\"]},{\"id\":\"transport\",\"text\":\"Escalate — CPP006\\nCode 1 transport\\nContinuous ECG monitoring\\nVSS every 5 min\\nPre-notify receiving ED: STEMI alert if applicable\",\"next\":[]}],\"medications_used\":[\"ASPIRIN\",\"GTN\",\"METHOXYFLURANE\",\"ENTONOX\"],\"quiz_triggers\":[\"What analgesia is CONTRAINDICATED in ACS?\",\"What is the dose and maximum number of doses of GTN for ACS?\",\"Why must NEPT not transport within 2 hours of cardiac chest pain onset?\",\"What SBP is required before administering GTN?\"],\"action_cards\":[{\"title\":\"🫀 Suspect ACS\",\"priority\":1,\"body\":\"Acute central chest pain or epigastric pain without other definitive diagnosis. Includes STEMI, NSTEMI, and unstable angina.\",\"params\":[\"⬤ NEPT must NOT transport patient with cardiac chest pain within 2 hours of presentation\",\"⬤ Escalate per CPP006 — ACS is time critical\"],\"subs\":[{\"label\":\"Symptoms may include\",\"params\":[\"Nausea / vomiting\",\"Diaphoresis\",\"ECG abnormalities\",\"Pain radiating to jaw, back, neck or groin\",\"Aching, pressure, tightness or burning\",\"Dyspnoea\",\"Fatigue\",\"Anxiety\"],\"style\":\"dotpoints\"}]},{\"title\":\"💊 Aspirin — First\",\"priority\":1,\"badge\":\"scope\",\"body\":\"Reduces platelet aggregation. Give as early as possible.\",\"scope_params\":{\"PTO\":[\"Aspirin 300 mg oral (chewed/dispersible)\"],\"EN\":[\"Aspirin 300 mg oral (chewed/dispersible)\"],\"ATA\":[\"Aspirin 300 mg oral (chewed/dispersible)\"],\"RN\":[\"Aspirin 300 mg oral (chewed/dispersible)\"],\"RNCC\":[\"Aspirin 300 mg oral (chewed/dispersible)\"]},\"params\":[\"⬤ Contraindicated if: haemophilia; actively bleeding gastritis/peptic ulcer; known hypersensitivity; suspected AAA; psychogenic chest pain\",\"⬤ Do NOT administer if aspirin already taken in previous 24 hours. Single dose only.\"]},{\"title\":\"💊 GTN — Reduce Workload\",\"priority\":2,\"body\":\"Reduces myocardial workload by reducing hypertension.\",\"params\":[\"⬤ Contraindicated if: haemorrhage / head trauma; SBP <100; HR >150 or <50; Pt on PDE5 inhibitors (Viagra, etc); known hypersensitivity\",\"GTN 0.3 mg sublingual OR GTN 0.4 mg nitrolingual spray\",\"Repeat 5 minutely PRN"
 + " (max 3 doses before seeking clinical advice)\",\"⬤ Check BP and HR between doses\",\"Titrate to Pt's pain and side effects\"],\"scopes\":[\"EN\",\"ATA\",\"RN\",\"RNCC\"]},{\"title\":\"💊 Pain Management\",\"priority\":2,\"body\":\"Complete pain removal is unlikely. Goal: reduce to a level the patient considers mild.\",\"scope_params\":{\"EN\":[\"Methoxyflurane 3 ml inhaled OR Entonox (self-administered)\"],\"ATA\":[\"Methoxyflurane 3 ml inhaled OR Entonox (self-administered)\"],\"RN\":[\"Methoxyflurane 3 ml inhaled OR Entonox (self-administered)\"],\"RNCC\":[\"Methoxyflurane 3 ml inhaled OR Entonox (self-administered)\"]},\"params\":[\"⬤ Paracetamol is NOT appropriate for suspected ACS\"]},{\"title\":\"⚠️ Prepare for Deterioration\",\"priority\":2,\"body\":\"ACS can deteriorate rapidly. Anticipate and prepare for cardiac arrest, cardiogenic shock, or acute pulmonary oedema.\",\"params\":[],\"scope_params\":{\"PTO\":[\"Ready defibrillator. Do NOT apply AED pads to conscious Pt\",\"Reassure Pt and position for comfort — anxiety increases cardiac workload\",\"Have suction and airway adjuncts immediately available\",\"⬤ If cardiac arrest → CPP004 Cardiac arrest\"],\"EN\":[\"Ready defibrillator. Apply pads if poorly perfused. Manual / SAED only if Pt in conscious WCT\",\"Reassure Pt and position for comfort — anxiety increases cardiac workload\",\"Have suction and airway adjuncts immediately available\",\"⬤ If cardiac arrest → CPP004 Cardiac arrest\"],\"ATA\":[\"Ready defibrillator. Apply pads if poorly perfused. Manual / SAED only if Pt in conscious WCT\",\"Reassure Pt and position for comfort — anxiety increases cardiac workload\",\"Have suction and airway adjuncts immediately available\",\"⬤ If cardiac arrest → CPP004 Cardiac arrest\"],\"RN\":[\"Ready defibrillator. Apply pads if poorly perfused. Manual / SAED only if Pt in conscious WCT\",\"Reassure Pt and position for comfort — anxiety increases cardiac workload\",\"Have suction and airway adjuncts immediately available\",\"⬤ If cardiac arrest → CPP004 Cardiac arrest\"],\"RNCC\":[\"Ready defibrillator. Apply pads if poorly perfused. Manual / SAED only if Pt in conscious WCT\",\"Reassure Pt and position for comfort — anxiety increases cardiac workload\",\"Have suction and airway adjuncts immediately available\",\"⬤ If cardiac arrest → CPP004 Cardiac arrest\"]},\"badge\":\"scope\",\"scope_notes\":{\"EN\":\"TE\",\"ATA\":\"TE\",\"RN\":\"TE\"}},{\"title\":\"📡 Monitoring & SITREP\",\"priority\":2,\"params\":[\"Continuous monitoring: SpO₂, HR, BP, ECG\",\"VSS every 5 minutes\",\"Update clinician as required\"],\"scope_params\":{\"EN\":[\"12-lead ECG acquisition if equipped — communicate findings\"],\"ATA\":[\"12-lead ECG acquisition if equipped — communicate findings\"],\"RN\":[\"12-lead ECG acquisition if equipped — communicate findings\"],\"RNCC\":[\"12-lead ECG acquisition if equipped — communicate findings\"],\"PTO\":[]},\"badge\":\"scope\"},{\"title\":\"🩹 Manage Associated Symptoms\",\"priority\":3,\"params\":[\"Manage hypoxia per CPP007 Oxygen therapy — target SpO₂ 94–98%\",\"Nausea / vomiting → CPP026\",\"If ACPO develops → CPP014\",\"If cardiogenic shock → CPP013\"]}],\"search_keywords\":[\"ACS\",\"acute coronary syndrome\",\"chest pain\",\"cardiac chest pain\",\"heart attack\",\"STEMI\",\"NSTEMI\",\"angina\",\"aspirin\",\"GTN\",\"glyceryl trinitrate\",\"ECG\",\"troponin\",\"acute coronary\",\"acute coronery\",\"angena\",\"asprin\",\"nitrolingual\",\"anginine\",\"hartattack\",\"myocardial\",\"myocardiel\"]},{\"id\":\"CPP033\",\"title\":\"CPP033: Potential Spinal Injury\",\"category\":\"Trauma\",\"scope_applicable\":[\"PTO\",\"EN\",\"ATA\",\"RN\",\"RNCC\"],\"background\":\"SCI = disruption of spinal axons from traumatic event. Not every spinal region injury = SCI. Spinal motion restriction (SMR) applies where indicated. Prophylactic ondansetron should be given to all patients managed with SMR.\",\"recognition\":[],\"memory_items\":[\"SCI suspected = time critical → escalate pe"
@@ -7652,11 +7841,4 @@ function buildAgeWheel(id, unit, max, onchange) {
     </div>
     <div id="med-drawer-body">
       <div id="md-panel-dose" class="md-panel active"></div>
-      <div id="md-panel-ci" class="md-panel"></div>
-      <div id="md-panel-prec" class="md-panel"></div>
-      <div id="md-panel-se" class="md-panel"></div>
-    </div>
-  </div>
-</div>
-</body>
-</html>
+      <div id
