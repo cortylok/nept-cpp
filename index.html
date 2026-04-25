@@ -4072,47 +4072,51 @@ function initMobileSidebar() {
   let touchCurrentX = 0;
   let isDragging = false;
   let isOpen = false;
+  let touchTracking = false; // Tracking a touch that *might* become a drag
   const edgeZone = 30; // px from left edge to start swipe-open
+  const dragThreshold = 8; // px of movement before we commit to dragging
   
   // Get sidebar width
   function getSbWidth() {
     return Math.min(window.innerWidth * 0.85, 340);
   }
   
-  // Touch start - on document for edge swipe, on sidebar for close swipe
   document.addEventListener('touchstart', function(e) {
     if (!isMobile()) return;
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
+    touchCurrentX = touchStartX;
     isOpen = sb.classList.contains('open');
     
-    // Allow swipe-open from left edge
-    if (!isOpen && touchStartX < edgeZone) {
-      isDragging = true;
-      sb.classList.add('dragging');
-    }
-    // Allow swipe-close from open sidebar
-    if (isOpen) {
-      isDragging = true;
-      sb.classList.add('dragging');
+    // Track touches that *might* become drags. Don't commit to dragging
+    // until we see actual movement — otherwise iOS taps inside the sidebar
+    // get treated as drag attempts and the synthesized click is suppressed.
+    if ((!isOpen && touchStartX < edgeZone) || isOpen) {
+      touchTracking = true;
+      isDragging = false;
+    } else {
+      touchTracking = false;
+      isDragging = false;
     }
   }, { passive: true });
   
   document.addEventListener('touchmove', function(e) {
-    if (!isDragging || !isMobile()) return;
+    if (!touchTracking || !isMobile()) return;
     touchCurrentX = e.touches[0].clientX;
     const deltaX = touchCurrentX - touchStartX;
     const deltaY = e.touches[0].clientY - touchStartY;
     
-    // If mostly vertical scroll, cancel drag
-    if (Math.abs(deltaY) > Math.abs(deltaX) * 1.5 && Math.abs(deltaX) < 20) {
-      isDragging = false;
-      sb.classList.remove('dragging');
-      if (isOpen) {
-        sb.style.transform = '';
-        ov.style.opacity = '';
+    // Commit to dragging only if horizontal movement crosses threshold AND
+    // the gesture is more horizontal than vertical
+    if (!isDragging) {
+      if (Math.abs(deltaX) < dragThreshold) return; // not enough movement yet
+      if (Math.abs(deltaY) > Math.abs(deltaX) * 1.5) {
+        // Vertical scroll — abandon
+        touchTracking = false;
+        return;
       }
-      return;
+      isDragging = true;
+      sb.classList.add('dragging');
     }
     
     const sbWidth = getSbWidth();
@@ -4132,8 +4136,15 @@ function initMobileSidebar() {
   }, { passive: true });
   
   document.addEventListener('touchend', function(e) {
-    if (!isDragging || !isMobile()) return;
+    if (!touchTracking || !isMobile()) return;
+    var wasDragging = isDragging;
+    touchTracking = false;
     isDragging = false;
+    
+    // If we never committed to dragging, this was a tap — let the normal
+    // click handler run, do nothing here.
+    if (!wasDragging) return;
+    
     sb.classList.remove('dragging');
     sb.style.transform = '';
     ov.style.opacity = '';
