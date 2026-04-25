@@ -6547,8 +6547,12 @@ function renderAssessTable(table) {
 
 // ── PAEDIATRIC WEIGHT & DRUG CALCULATOR ──────────────────────────────────
 function renderPaedCalc() {
-  document.getElementById('empty-state').style.display = 'none';
-  document.getElementById('viewer').style.display = 'block';
+  if (window.__dbgLog) window.__dbgLog('renderPaedCalc: ENTERED');
+  var es = document.getElementById('empty-state');
+  var vw = document.getElementById('viewer');
+  if (window.__dbgLog) window.__dbgLog('renderPaedCalc: empty-state=' + (es ? 'found' : 'MISSING') + ', viewer=' + (vw ? 'found' : 'MISSING'));
+  if (es) es.style.display = 'none';
+  if (vw) vw.style.display = 'block';
 
   // Preserve existing values across scope changes — only reset if not yet set
   if (_miniPaedAge === null && _miniPaedWt === null) {
@@ -6597,7 +6601,12 @@ function renderPaedCalc() {
   html += '<div id="paed-calc-result" class="paed-result-area" style="display:none"></div>';
   html += '</div>';
 
+  if (window.__dbgLog) window.__dbgLog('renderPaedCalc: html length=' + html.length);
   var _v3 = document.getElementById('viewer'); _v3.innerHTML = html; _iosRepaintFix(_v3);
+  if (window.__dbgLog) {
+    var rect = _v3.getBoundingClientRect();
+    window.__dbgLog('renderPaedCalc: AFTER innerHTML — viewer dims w=' + Math.round(rect.width) + ' h=' + Math.round(rect.height) + ' top=' + Math.round(rect.top) + ' display=' + getComputedStyle(_v3).display + ' visibility=' + getComputedStyle(_v3).visibility + ' children=' + _v3.children.length);
+  }
 
   // Restore values if they exist (e.g. after scope change)
   if (_miniPaedAge !== null || _miniPaedWt !== null) {
