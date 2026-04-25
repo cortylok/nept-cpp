@@ -5729,11 +5729,17 @@ function renderItem(id) {
 
   document.getElementById('empty-state').style.display = 'none';
   document.getElementById('viewer').style.display = 'block';
-  // Scroll to top unless restoring from back button
+  // Scroll to top unless restoring from back button.
+  // Use scrollTo with behavior:'auto' explicitly — setting scrollTop directly on
+  // iOS can interact badly with scroll-behavior:smooth on the parent, causing
+  // newly-inserted content to render outside the viewport on first paint.
   if (!_navSkipPush) {
     _scrollPos = { quick: 0, full: 0 };
     var c = document.getElementById('content');
-    if (c) c.scrollTop = 0;
+    if (c) {
+      if (c.scrollTo) c.scrollTo({ top: 0, behavior: 'auto' });
+      else c.scrollTop = 0;
+    }
   }
 
   if (proto) {
@@ -5746,6 +5752,22 @@ function renderItem(id) {
     document.getElementById('mode-fp').checked = (currentViewMode === 'full');
     if (proto.id === 'ASSESS_PAED_CALC') {
       renderPaedCalc();
+      // Probe: surface the viewer state to debug overlay if active
+      if (window.__dbgLog) {
+        setTimeout(function() {
+          var v = document.getElementById('viewer');
+          if (v) {
+            var r = v.getBoundingClientRect();
+            var cs = getComputedStyle(v);
+            window.__dbgLog('PAED post-render: w=' + Math.round(r.width) + ' h=' + Math.round(r.height) + ' top=' + Math.round(r.top) + ' display=' + cs.display + ' visibility=' + cs.visibility + ' opacity=' + cs.opacity + ' children=' + v.children.length + ' htmlLen=' + v.innerHTML.length);
+            var c = document.getElementById('content');
+            if (c) {
+              var cr = c.getBoundingClientRect();
+              window.__dbgLog('CONTENT post-render: w=' + Math.round(cr.width) + ' h=' + Math.round(cr.height) + ' scrollTop=' + c.scrollTop + ' scrollHeight=' + c.scrollHeight);
+            }
+          }
+        }, 100);
+      }
     } else {
       renderProtocol(proto);
     }
