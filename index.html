@@ -398,6 +398,18 @@ if ('serviceWorker' in navigator) {
     scroll-behavior: smooth;
     background: var(--bg);
     box-shadow: 80px 0 120px -40px rgba(0,0,0,0.7), -80px 0 120px -40px rgba(0,0,0,0.7);
+    /* iOS WebKit: force paint-layer to invalidate on content change.
+       Without these hints, iOS Safari sometimes preserves a stale GPU
+       layer when innerHTML is swapped rapidly, causing pages to render
+       blank on first visit but populate correctly on revisit. */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  /* Same hint on #viewer — most innerHTML swaps target this child element */
+  #viewer {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    min-height: 1px; /* ensures a paint box even when content is being swapped */
   }
   /* Widescreen: constrain content to a 1:1 aspect ratio of viewport height
      so on ultrawide monitors the reading column stays square-ish.
@@ -2735,6 +2747,23 @@ let currentViewMode = 'quick'; // 'quick' or 'full'
 let navHistory = []; // Navigation history stack for back button
 let learningMode = null; // null = off, or {from:'PTO', to:'ATA'}
 
+// ── iOS REPAINT HELPER ────────────────────────────────────────────────────
+// Some iPhones running newer iOS preserve stale GPU compositor layers when
+// innerHTML is swapped, causing newly-rendered content to be invisible
+// until the user navigates away and back. This helper forces a paint flush.
+// Safe to call on all platforms — no-op on devices that don't need it.
+function _iosRepaintFix(el) {
+  if (!el) return;
+  try {
+    // Reading offsetHeight forces synchronous layout, flushing pending paints.
+    // The display toggle nudges WebKit to invalidate the compositor layer.
+    var prev = el.style.display;
+    el.style.display = 'none';
+    void el.offsetHeight; // force reflow (the 'void' silences linters)
+    el.style.display = prev || '';
+  } catch (e) { /* never let a paint hint break rendering */ }
+}
+
 // ── LEARNING SUMMARIES (manually curated per pathway) ───────────────
 // Format: LEARNING_SUMMARIES["FROM_TO"]["CPP_ID"] = { text: "summary for student" }
 // Lok will populate these — placeholders for now
@@ -3847,6 +3876,7 @@ function showAboutPage() {
   h += '</div>';
 
   viewer.innerHTML = h;
+  _iosRepaintFix(viewer);
   document.getElementById('content').scrollTop = 0;
 }
 
@@ -5461,7 +5491,7 @@ function renderScopeTable() {
 
   var outerHtml = '<div class="scope-wrap">' + stickyHtml + listHtml + '</div>';
 
-  document.getElementById('viewer').innerHTML = outerHtml;
+  var _v = document.getElementById('viewer'); _v.innerHTML = outerHtml; _iosRepaintFix(_v);
   document.getElementById('content').style.paddingTop = '0';
   var _focusCat = window._scopeFocusCat;
   var _keepScroll = window._scopeKeepScroll;
@@ -6398,7 +6428,7 @@ function renderProtocol(p) {
     '<div id="fp-view" style="display:' + fpD + ';">' + fpHtml + '</div>';
   } catch(e) {
     console.error('renderProtocol error:', e, 'for', p && p.id);
-    document.getElementById('viewer').innerHTML = '<div style="padding:20px;color:var(--red);">Error rendering ' + (p && p.id || 'protocol') + ': ' + e.message + '</div>';
+    var _ve = document.getElementById('viewer'); _ve.innerHTML = '<div style="padding:20px;color:var(--red);">Error rendering ' + (p && p.id || 'protocol') + ': ' + e.message + '</div>'; _iosRepaintFix(_ve);
   }
 }
 
@@ -6567,7 +6597,7 @@ function renderPaedCalc() {
   html += '<div id="paed-calc-result" class="paed-result-area" style="display:none"></div>';
   html += '</div>';
 
-  document.getElementById('viewer').innerHTML = html;
+  var _v3 = document.getElementById('viewer'); _v3.innerHTML = html; _iosRepaintFix(_v3);
 
   // Restore values if they exist (e.g. after scope change)
   if (_miniPaedAge !== null || _miniPaedWt !== null) {
@@ -7342,7 +7372,7 @@ function renderMedication(m) {
     ${renderMedPharmacology(m)}
   </div>`;
 
-  document.getElementById('viewer').innerHTML = html;
+  var _v4 = document.getElementById('viewer'); _v4.innerHTML = html; _iosRepaintFix(_v4);
 }
 
 function showMedPanel(panel, btn) {
@@ -8812,7 +8842,7 @@ function renderAppendix(id) {
   }
 
   html += '</div></div>'; // close fp-body and fp-container
-  document.getElementById('viewer').innerHTML = html;
+  var _v5 = document.getElementById('viewer'); _v5.innerHTML = html; _iosRepaintFix(_v5);
 }
 
 function filterAbbr(q) {
