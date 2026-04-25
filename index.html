@@ -3202,6 +3202,13 @@ function invalidateScopeCache() {
 
 // ── INIT ──────────────────────────────────────────────────────────────────
 function init() {
+  // Diagnostic mode: if URL ends with #diag, show diagnostics page instead of normal app
+  if ((location.hash || '').indexOf('diag') !== -1) {
+    try { showDiagnostics(); return; } catch(e) {
+      document.body.innerHTML = '<pre style="color:#fff;background:#7f1d1d;padding:20px;font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-word;">DIAG ERROR: ' + (e.message || e) + '\n\nStack:\n' + (e.stack || 'no stack') + '</pre>';
+      return;
+    }
+  }
   checkDisclaimer();
   var saved = null;
   try { saved = localStorage.getItem('nept_default_scope'); } catch(e) {}
@@ -3210,6 +3217,128 @@ function init() {
   initMobileSidebar();
   restoreTextSize();
   initHardwareBack();
+}
+
+// Diagnostic page — accessible via #diag in the URL.
+// Shows everything we need to debug iOS rendering issues.
+function showDiagnostics() {
+  var info = [];
+  info.push('═══ NEPT DIAGNOSTICS ═══');
+  info.push('Time: ' + new Date().toISOString());
+  info.push('');
+  info.push('━━ Browser ━━');
+  info.push('User Agent: ' + navigator.userAgent);
+  info.push('Vendor: ' + (navigator.vendor || 'n/a'));
+  info.push('Language: ' + navigator.language);
+  info.push('Platform: ' + (navigator.platform || 'n/a'));
+  info.push('Online: ' + navigator.onLine);
+  info.push('Cookies enabled: ' + navigator.cookieEnabled);
+  info.push('');
+  info.push('━━ Screen ━━');
+  info.push('Window inner: ' + window.innerWidth + ' x ' + window.innerHeight);
+  info.push('Screen: ' + (screen.width || '?') + ' x ' + (screen.height || '?'));
+  info.push('Pixel ratio: ' + (window.devicePixelRatio || 1));
+  info.push('Orientation: ' + (screen.orientation ? screen.orientation.type : 'n/a'));
+  info.push('');
+  info.push('━━ Storage ━━');
+  try {
+    localStorage.setItem('__diag_test__', '1');
+    var ok = localStorage.getItem('__diag_test__') === '1';
+    localStorage.removeItem('__diag_test__');
+    info.push('localStorage: ' + (ok ? 'WORKING' : 'FAILED'));
+    info.push('localStorage items: ' + localStorage.length);
+  } catch(e) {
+    info.push('localStorage: ERROR — ' + (e.message || e));
+  }
+  info.push('');
+  info.push('━━ App data ━━');
+  try {
+    info.push('NEPT_EMBEDDED_DATA exists: ' + (typeof NEPT_EMBEDDED_DATA !== 'undefined'));
+    if (typeof NEPT_EMBEDDED_DATA !== 'undefined' && NEPT_EMBEDDED_DATA) {
+      info.push('  protocols: ' + (NEPT_EMBEDDED_DATA.protocols ? Object.keys(NEPT_EMBEDDED_DATA.protocols).length : 'MISSING'));
+      info.push('  medications: ' + (NEPT_EMBEDDED_DATA.medications ? Object.keys(NEPT_EMBEDDED_DATA.medications).length : 'MISSING'));
+      info.push('  appendices: ' + (NEPT_EMBEDDED_DATA.appendices ? Object.keys(NEPT_EMBEDDED_DATA.appendices).length : 'MISSING'));
+      info.push('  metadata version: ' + (NEPT_EMBEDDED_DATA.metadata && NEPT_EMBEDDED_DATA.metadata.app_version || 'none'));
+      // Check if specific commonly-problematic protocols are present
+      var checkIds = ['CPP022','CPP005','ASSESS_PAED_CALC'];
+      checkIds.forEach(function(id) {
+        var found = NEPT_EMBEDDED_DATA.protocols && NEPT_EMBEDDED_DATA.protocols[id];
+        info.push('  protocol[' + id + ']: ' + (found ? 'present' : 'MISSING'));
+      });
+    }
+    info.push('NEPT_DATA loaded: ' + (typeof NEPT_DATA !== 'undefined' && NEPT_DATA !== null));
+  } catch(e) {
+    info.push('Data check ERROR: ' + (e.message || e));
+  }
+  info.push('');
+  info.push('━━ Functions defined ━━');
+  ['renderPaedCalc','renderProtocol','renderMedication','renderScopeTable','renderAppendix','setScope','init'].forEach(function(fn) {
+    info.push('  ' + fn + ': ' + (typeof window[fn]));
+  });
+  info.push('');
+  info.push('━━ Try render test ━━');
+  // Try actually calling renderPaedCalc and see what happens
+  try {
+    if (typeof renderPaedCalc === 'function') {
+      var v = document.getElementById('viewer');
+      var beforeChildren = v ? v.children.length : 'no viewer';
+      var beforeHTML = v ? v.innerHTML.length : 0;
+      info.push('Calling renderPaedCalc()...');
+      renderPaedCalc();
+      var afterChildren = v ? v.children.length : 'no viewer';
+      var afterHTML = v ? v.innerHTML.length : 0;
+      info.push('  before: children=' + beforeChildren + ' htmlLen=' + beforeHTML);
+      info.push('  after:  children=' + afterChildren + ' htmlLen=' + afterHTML);
+      if (v) {
+        var rect = v.getBoundingClientRect();
+        info.push('  viewer rect: w=' + Math.round(rect.width) + ' h=' + Math.round(rect.height) + ' top=' + Math.round(rect.top) + ' left=' + Math.round(rect.left));
+        info.push('  viewer display: ' + getComputedStyle(v).display);
+        info.push('  viewer visibility: ' + getComputedStyle(v).visibility);
+        info.push('  viewer opacity: ' + getComputedStyle(v).opacity);
+        info.push('  viewer transform: ' + getComputedStyle(v).transform);
+      }
+    } else {
+      info.push('renderPaedCalc is not a function');
+    }
+  } catch(e) {
+    info.push('Render test ERROR: ' + (e.message || e));
+    info.push('Stack: ' + (e.stack || 'no stack'));
+  }
+
+  // Render the diagnostics page
+  document.body.innerHTML =
+    '<div style="background:#0d0f12;color:#cbd5e1;font-family:ui-monospace,Menlo,monospace;font-size:12px;padding:16px;min-height:100vh;-webkit-overflow-scrolling:touch;">' +
+    '<h1 style="color:#60a5fa;font-size:16px;margin:0 0 12px;font-family:system-ui,sans-serif;">NEPT App Diagnostics</h1>' +
+    '<button id="diag-copy-btn" style="background:#1e40af;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:13px;font-family:system-ui;font-weight:600;margin-bottom:12px;cursor:pointer;">Copy all to clipboard</button>' +
+    '<pre id="diag-output" style="background:#1a1d24;border:1px solid #334155;border-radius:6px;padding:12px;white-space:pre-wrap;word-break:break-word;font-size:11px;line-height:1.5;">' +
+    info.join('\n').replace(/&/g,'&amp;').replace(/</g,'&lt;') +
+    '</pre>' +
+    '<p style="color:#64748b;font-size:11px;margin-top:12px;font-family:system-ui;">Copy the text above and send it to the developer.</p>' +
+    '</div>';
+
+  document.getElementById('diag-copy-btn').addEventListener('click', function() {
+    var text = document.getElementById('diag-output').textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        document.getElementById('diag-copy-btn').textContent = 'Copied ✓';
+      }).catch(function() {
+        // Fallback: select the text so user can long-press copy
+        var range = document.createRange();
+        range.selectNodeContents(document.getElementById('diag-output'));
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.getElementById('diag-copy-btn').textContent = 'Selected — long press to copy';
+      });
+    } else {
+      var range = document.createRange();
+      range.selectNodeContents(document.getElementById('diag-output'));
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      document.getElementById('diag-copy-btn').textContent = 'Selected — long press to copy';
+    }
+  });
 }
 
 // ── HARDWARE BACK BUTTON (Android) ────────────────────────────────────────
